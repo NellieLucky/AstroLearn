@@ -15885,7 +15885,7 @@ MonoBehaviour:
   - label: Temperature (mean)
     value: "<b>464 \xB0C</b>"
   - label: Atmosphere
-    value: CO2
+    value: <b>CO2</b>
   focusDistanceOverride: 0
   minFocusDistanceOverride: 0.35
   maxFocusDistanceOverride: 30
