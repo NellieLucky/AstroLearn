@@ -38,6 +38,10 @@ public class PlanetInfoUI : MonoBehaviour
     public ScrollRect orbitCharacteristicsScrollRect;
     public ScrollRect structureScrollRect;
     public ScrollRect atmosphereScrollRect;
+    public TMP_Text orbitCharacteristicsDescriptionText;
+    public TMP_Text structureDescriptionText;
+    public Image atmosphereMainImage;
+    public TMP_Text atmosphereDescriptionText;
     public Camera mainCamera;
     public MobileOrbitCamera orbitCamera;
     public GameObject solarSystemUiRoot;
@@ -57,6 +61,25 @@ public class PlanetInfoUI : MonoBehaviour
     public Image hideUnhideIconImage;
     public Sprite hideIconSprite;
     public Sprite viewIconSprite;
+    public Button basicsButton;
+    public Button extrasButton;
+    public GameObject basicsGroup;
+    public GameObject extrasGroup;
+    public Image basicsButtonFill;
+    public Image extrasButtonFill;
+    public Button viewInArButton;
+    public Image arPlanetIcon;
+    public Button imagesButton;
+    public GameObject imagesGalleryOverlay;
+    public ScrollRect galleryScrollRect;
+    public Button galleryBackButton;
+    public GameObject imageViewerOverlay;
+    public Button viewerCloseButton;
+    public Button viewerPreviousButton;
+    public Button viewerNextButton;
+    public TMP_Text viewerImageTitleText;
+    public Image viewerMainImage;
+    public TMP_Text viewerDescriptionText;
 
     [Header("Celestial Body UI")]
     public Button planetaryProfileButton;
@@ -79,11 +102,17 @@ public class PlanetInfoUI : MonoBehaviour
     public float navButtonActiveScale = 1.08f;
     public Color statsOddRowColor = new Color(0.02f, 0.02f, 0.02f, 0.85f);
     public Color statsEvenRowColor = new Color(0.03f, 0.14f, 0.4f, 0.9f);
+    public bool showSolarSystemLabels = true;
+    public Vector2 solarSystemLabelScreenOffset = new Vector2(18f, 10f);
+    public int solarSystemLabelFontSize = 18;
+    public Color solarSystemLabelColor = new Color(0.85f, 0.9f, 1f, 1f);
+    public Color activeBottomTabFillColor = Color.black;
 
     private CelestialBody currentBody;
     private OrbitAroundSun[] orbitAroundSunScripts;
     private OrbitAroundPlanet[] orbitAroundPlanetScripts;
     private PlanetRotation[] rotationScripts;
+    private OrbitSnakeTrail[] orbitSnakeTrails;
     private Coroutine sectionAnimationCoroutine;
     private CelestialSection? activeSection;
     private RectTransform contentAreaRectTransform;
@@ -97,6 +126,9 @@ public class PlanetInfoUI : MonoBehaviour
     private readonly Dictionary<GameObject, bool> hiddenUiStateMap = new Dictionary<GameObject, bool>();
     private readonly List<Image> hideUnhideIconImages = new List<Image>();
     private readonly Dictionary<string, Sprite> runtimeBodySpriteCache = new Dictionary<string, Sprite>();
+    private Color basicsButtonFillOriginalColor = Color.white;
+    private Color extrasButtonFillOriginalColor = Color.white;
+    private bool showBasicsTab = true;
     private static readonly string[] FocusOrder =
     {
         "Sun",
@@ -113,12 +145,21 @@ public class PlanetInfoUI : MonoBehaviour
     private GameObject celestialBodyUiRoot;
     private bool isCelestialBodyUiHidden;
     private Image planetaryProfileMainImageContent;
+    private Image atmosphereMainImageContent;
     private Coroutine visitRefreshCoroutine;
     private RectTransform statsContent;
     private GameObject statRowTemplate;
     private TMP_Text statRowTemplateLabelText;
     private TMP_Text statRowTemplateValueText;
     private readonly List<GameObject> generatedStatRows = new List<GameObject>();
+    private RectTransform galleryContent;
+    private GameObject galleryItemTemplate;
+    private Image galleryItemTemplateThumbnailImage;
+    private readonly List<GameObject> generatedGalleryItems = new List<GameObject>();
+    private int currentGalleryIndex = -1;
+    private RectTransform solarSystemLabelsRoot;
+    private Canvas solarSystemCanvas;
+    private readonly Dictionary<CelestialBody, TMP_Text> solarSystemLabelMap = new Dictionary<CelestialBody, TMP_Text>();
 
     private void Awake()
     {
@@ -262,6 +303,61 @@ public class PlanetInfoUI : MonoBehaviour
             hideUnhideButton = FindButtonByName("HideUnhideButton");
         }
 
+        if (basicsButton == null)
+        {
+            basicsButton = FindComponentInChildrenByName<Button>(celestialBodyUiRoot, "BasicsButton");
+        }
+
+        if (extrasButton == null)
+        {
+            extrasButton = FindComponentInChildrenByName<Button>(celestialBodyUiRoot, "ExtrasButton");
+        }
+
+        if (basicsGroup == null)
+        {
+            basicsGroup = FindChildObjectByName(celestialBodyUiRoot, "Basics");
+        }
+
+        if (extrasGroup == null)
+        {
+            extrasGroup = FindChildObjectByName(celestialBodyUiRoot, "Extras");
+        }
+
+        if (basicsButtonFill == null && basicsButton != null)
+        {
+            basicsButtonFill = FindComponentInChildrenByName<Image>(basicsButton.gameObject, "Fill");
+
+            if (basicsButtonFill == null)
+            {
+                basicsButtonFill = FindComponentInChildrenByName<Image>(basicsButton.gameObject, "Fill2");
+            }
+        }
+
+        if (extrasButtonFill == null && extrasButton != null)
+        {
+            extrasButtonFill = FindComponentInChildrenByName<Image>(extrasButton.gameObject, "Fill");
+
+            if (extrasButtonFill == null)
+            {
+                extrasButtonFill = FindComponentInChildrenByName<Image>(extrasButton.gameObject, "Fill2");
+            }
+        }
+
+        if (viewInArButton == null)
+        {
+            viewInArButton = FindComponentInChildrenByName<Button>(celestialBodyUiRoot, "ViewInArButton");
+        }
+
+        if (arPlanetIcon == null && viewInArButton != null)
+        {
+            arPlanetIcon = FindComponentInChildrenByName<Image>(viewInArButton.gameObject, "ARPlanetIcon");
+        }
+
+        if (imagesButton == null)
+        {
+            imagesButton = FindComponentInChildrenByName<Button>(celestialBodyUiRoot, "ImagesButton");
+        }
+
         hidePanelButtons.Clear();
         if (celestialBodyUiRoot != null)
         {
@@ -402,6 +498,11 @@ public class PlanetInfoUI : MonoBehaviour
             orbitCharacteristicsScrollRect = FindComponentInChildrenByName<ScrollRect>(orbitCharacteristicsPanel, "OrbitDescriptionScrollView");
         }
 
+        if (orbitCharacteristicsDescriptionText == null)
+        {
+            orbitCharacteristicsDescriptionText = FindComponentInChildrenByName<TMP_Text>(orbitCharacteristicsPanel, "DescriptionText");
+        }
+
         if (structurePanel == null)
         {
             structurePanel = FindChildObjectByName(celestialBodyUiRoot, "SolidCore");
@@ -417,6 +518,11 @@ public class PlanetInfoUI : MonoBehaviour
             structureScrollRect = FindComponentInChildrenByName<ScrollRect>(structurePanel, "CoreDescriptionScrollView");
         }
 
+        if (structureDescriptionText == null)
+        {
+            structureDescriptionText = FindComponentInChildrenByName<TMP_Text>(structurePanel, "DescriptionText");
+        }
+
         if (atmospherePanel == null)
         {
             atmospherePanel = FindChildObjectByName(celestialBodyUiRoot, "Atmosphere");
@@ -430,6 +536,89 @@ public class PlanetInfoUI : MonoBehaviour
         if (atmosphereScrollRect == null)
         {
             atmosphereScrollRect = FindComponentInChildrenByName<ScrollRect>(atmospherePanel, "AtmosphereDescriptionScrollView");
+        }
+
+        if (atmosphereMainImage == null)
+        {
+            atmosphereMainImage = FindComponentInChildrenByName<Image>(atmospherePanel, "MainImage");
+        }
+
+        if (atmosphereDescriptionText == null)
+        {
+            atmosphereDescriptionText = FindComponentInChildrenByName<TMP_Text>(atmospherePanel, "DescriptionText");
+        }
+
+        EnsureAtmosphereCoverImage();
+
+        if (imagesGalleryOverlay == null)
+        {
+            imagesGalleryOverlay = FindChildObjectByName(celestialBodyUiRoot, "ImagesGalleryOverlay");
+        }
+
+        if (galleryScrollRect == null && imagesGalleryOverlay != null)
+        {
+            galleryScrollRect = FindComponentInChildrenByName<ScrollRect>(imagesGalleryOverlay, "GalleryScrollView");
+        }
+
+        if (galleryContent == null && galleryScrollRect != null)
+        {
+            galleryContent = galleryScrollRect.content;
+        }
+
+        if (galleryItemTemplate == null && imagesGalleryOverlay != null)
+        {
+            galleryItemTemplate = FindChildObjectByName(imagesGalleryOverlay, "GalleryItemTemplate");
+        }
+
+        if (galleryItemTemplate != null)
+        {
+            galleryItemTemplateThumbnailImage = FindComponentInChildrenByName<Image>(galleryItemTemplate, "ThumbnailImage");
+            galleryItemTemplate.SetActive(false);
+        }
+
+        if (galleryBackButton == null && imagesGalleryOverlay != null)
+        {
+            galleryBackButton = FindComponentInChildrenByName<Button>(imagesGalleryOverlay, "GalleryBackButton");
+
+            if (galleryBackButton == null)
+            {
+                galleryBackButton = FindComponentInChildrenByName<Button>(imagesGalleryOverlay, "BackButton");
+            }
+        }
+
+        if (imageViewerOverlay == null)
+        {
+            imageViewerOverlay = FindChildObjectByName(celestialBodyUiRoot, "ImageViewerOverlay");
+        }
+
+        if (viewerCloseButton == null && imageViewerOverlay != null)
+        {
+            viewerCloseButton = FindComponentInChildrenByName<Button>(imageViewerOverlay, "ViewerCloseButton");
+        }
+
+        if (viewerPreviousButton == null && imageViewerOverlay != null)
+        {
+            viewerPreviousButton = FindComponentInChildrenByName<Button>(imageViewerOverlay, "ViewerPreviousButton");
+        }
+
+        if (viewerNextButton == null && imageViewerOverlay != null)
+        {
+            viewerNextButton = FindComponentInChildrenByName<Button>(imageViewerOverlay, "ViewerNextButton");
+        }
+
+        if (viewerImageTitleText == null && imageViewerOverlay != null)
+        {
+            viewerImageTitleText = FindComponentInChildrenByName<TMP_Text>(imageViewerOverlay, "ViewerImageTitle");
+        }
+
+        if (viewerMainImage == null && imageViewerOverlay != null)
+        {
+            viewerMainImage = FindComponentInChildrenByName<Image>(imageViewerOverlay, "ViewerMainImage");
+        }
+
+        if (viewerDescriptionText == null && imageViewerOverlay != null)
+        {
+            viewerDescriptionText = FindComponentInChildrenByName<TMP_Text>(imageViewerOverlay, "ViewerDescriptionText");
         }
 
         if (contentAreaRectTransform == null)
@@ -452,6 +641,16 @@ public class PlanetInfoUI : MonoBehaviour
             hideUnhideIconImage = FindChildImage(hideUnhideButton, "Icon");
         }
 
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(false);
+        }
+
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(false);
+        }
+
         if (hideUnhideIconImage == null && hideUnhideButton != null)
         {
             hideUnhideIconImage = FindFirstChildImage(hideUnhideButton);
@@ -469,8 +668,10 @@ public class PlanetInfoUI : MonoBehaviour
 
         EnsureHideUnhideSpritesLoaded();
         CacheHideUnhideIconImages();
+        CacheBottomTabVisualDefaults();
 
         CacheSectionAnchoredPositions();
+        InitializeSolarSystemLabels();
 
         if (speedSlider == null)
         {
@@ -483,6 +684,7 @@ public class PlanetInfoUI : MonoBehaviour
         }
 
         CacheNavigationVisualDefaults();
+        UpdateBottomTabVisuals();
     }
 
     private void Start()
@@ -490,6 +692,7 @@ public class PlanetInfoUI : MonoBehaviour
         orbitAroundSunScripts = FindObjectsByType<OrbitAroundSun>(FindObjectsSortMode.None);
         orbitAroundPlanetScripts = FindObjectsByType<OrbitAroundPlanet>(FindObjectsSortMode.None);
         rotationScripts = FindObjectsByType<PlanetRotation>(FindObjectsSortMode.None);
+        orbitSnakeTrails = FindObjectsByType<OrbitSnakeTrail>(FindObjectsSortMode.None);
 
         if (panel != null)
         {
@@ -546,6 +749,41 @@ public class PlanetInfoUI : MonoBehaviour
             hidePanelButton.onClick.AddListener(HandleHidePanelButton);
         }
 
+        if (basicsButton != null)
+        {
+            basicsButton.onClick.AddListener(HandleBasicsButton);
+        }
+
+        if (extrasButton != null)
+        {
+            extrasButton.onClick.AddListener(HandleExtrasButton);
+        }
+
+        if (imagesButton != null)
+        {
+            imagesButton.onClick.AddListener(HandleImagesButton);
+        }
+
+        if (galleryBackButton != null)
+        {
+            galleryBackButton.onClick.AddListener(HandleGalleryBackButton);
+        }
+
+        if (viewerCloseButton != null)
+        {
+            viewerCloseButton.onClick.AddListener(HandleViewerCloseButton);
+        }
+
+        if (viewerPreviousButton != null)
+        {
+            viewerPreviousButton.onClick.AddListener(HandleViewerPreviousButton);
+        }
+
+        if (viewerNextButton != null)
+        {
+            viewerNextButton.onClick.AddListener(HandleViewerNextButton);
+        }
+
         foreach (Button button in hidePanelButtons)
         {
             if (button != null && button != hidePanelButton)
@@ -587,6 +825,8 @@ public class PlanetInfoUI : MonoBehaviour
         {
             UpdateNavigationButtonVisuals(null);
         }
+
+        ShowBasicsTab(false);
 
         if (currentBody != null)
         {
@@ -647,6 +887,21 @@ public class PlanetInfoUI : MonoBehaviour
             hidePanelButton.onClick.RemoveListener(HandleHidePanelButton);
         }
 
+        if (basicsButton != null)
+        {
+            basicsButton.onClick.RemoveListener(HandleBasicsButton);
+        }
+
+        if (extrasButton != null)
+        {
+            extrasButton.onClick.RemoveListener(HandleExtrasButton);
+        }
+
+        if (imagesButton != null)
+        {
+            imagesButton.onClick.RemoveListener(HandleImagesButton);
+        }
+
         foreach (Button button in hidePanelButtons)
         {
             if (button != null && button != hidePanelButton)
@@ -679,10 +934,32 @@ public class PlanetInfoUI : MonoBehaviour
         {
             atmosphereButton.onClick.RemoveListener(HandleAtmosphereButton);
         }
+
+        if (galleryBackButton != null)
+        {
+            galleryBackButton.onClick.RemoveListener(HandleGalleryBackButton);
+        }
+
+        if (viewerCloseButton != null)
+        {
+            viewerCloseButton.onClick.RemoveListener(HandleViewerCloseButton);
+        }
+
+        if (viewerPreviousButton != null)
+        {
+            viewerPreviousButton.onClick.RemoveListener(HandleViewerPreviousButton);
+        }
+
+        if (viewerNextButton != null)
+        {
+            viewerNextButton.onClick.RemoveListener(HandleViewerNextButton);
+        }
     }
 
     private void Update()
     {
+        UpdateSolarSystemLabels();
+
         Vector2? pointerPosition = GetPointerDownPosition();
 
         if (!pointerPosition.HasValue || mainCamera == null)
@@ -708,6 +985,152 @@ public class PlanetInfoUI : MonoBehaviour
         }
 
         FocusBody(body);
+    }
+
+    private void InitializeSolarSystemLabels()
+    {
+        if (!showSolarSystemLabels || solarSystemUiRoot == null)
+        {
+            return;
+        }
+
+        solarSystemCanvas = solarSystemUiRoot.GetComponent<Canvas>();
+        if (solarSystemCanvas == null)
+        {
+            return;
+        }
+
+        GameObject labelsRootObject = FindChildObjectByName(solarSystemUiRoot, "SolarSystemLabels");
+        if (labelsRootObject == null)
+        {
+            labelsRootObject = new GameObject("SolarSystemLabels", typeof(RectTransform));
+            labelsRootObject.transform.SetParent(solarSystemUiRoot.transform, false);
+        }
+
+        solarSystemLabelsRoot = labelsRootObject.GetComponent<RectTransform>();
+        solarSystemLabelsRoot.anchorMin = Vector2.zero;
+        solarSystemLabelsRoot.anchorMax = Vector2.one;
+        solarSystemLabelsRoot.offsetMin = Vector2.zero;
+        solarSystemLabelsRoot.offsetMax = Vector2.zero;
+        solarSystemLabelsRoot.SetAsLastSibling();
+
+        solarSystemLabelMap.Clear();
+        CelestialBody[] bodies = FindObjectsByType<CelestialBody>(FindObjectsSortMode.None);
+        foreach (CelestialBody body in bodies)
+        {
+            if (body == null || string.IsNullOrWhiteSpace(body.bodyName))
+            {
+                continue;
+            }
+
+            TMP_Text labelText = CreateSolarSystemLabel(body);
+            if (labelText != null)
+            {
+                solarSystemLabelMap[body] = labelText;
+            }
+        }
+    }
+
+    private TMP_Text CreateSolarSystemLabel(CelestialBody body)
+    {
+        if (solarSystemLabelsRoot == null)
+        {
+            return null;
+        }
+
+        GameObject labelObject = new GameObject($"{body.bodyName}Label", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        labelObject.transform.SetParent(solarSystemLabelsRoot, false);
+
+        TextMeshProUGUI labelText = labelObject.GetComponent<TextMeshProUGUI>();
+        labelText.text = body.bodyName;
+        labelText.fontSize = solarSystemLabelFontSize;
+        labelText.color = body.labelColor;
+        labelText.alignment = TextAlignmentOptions.Center;
+        labelText.textWrappingMode = TextWrappingModes.NoWrap;
+        labelText.raycastTarget = false;
+
+        RectTransform rectTransform = labelText.rectTransform;
+        rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        rectTransform.sizeDelta = new Vector2(160f, 32f);
+
+        return labelText;
+    }
+
+    private void UpdateSolarSystemLabels()
+    {
+        if (!showSolarSystemLabels || mainCamera == null || solarSystemLabelsRoot == null)
+        {
+            return;
+        }
+
+        bool shouldShow = solarSystemUiRoot != null && solarSystemUiRoot.activeInHierarchy && currentBody == null;
+        solarSystemLabelsRoot.gameObject.SetActive(shouldShow);
+
+        if (!shouldShow)
+        {
+            return;
+        }
+
+        RectTransform canvasRect = solarSystemCanvas != null ? solarSystemCanvas.GetComponent<RectTransform>() : solarSystemLabelsRoot;
+
+        foreach (KeyValuePair<CelestialBody, TMP_Text> pair in solarSystemLabelMap)
+        {
+            CelestialBody body = pair.Key;
+            TMP_Text labelText = pair.Value;
+
+            if (body == null || labelText == null)
+            {
+                continue;
+            }
+
+            labelText.color = body.labelColor;
+
+            Vector3 worldCenter = body.transform.position;
+            Renderer bodyRenderer = body.GetComponent<Renderer>();
+            if (bodyRenderer == null)
+            {
+                bodyRenderer = body.GetComponentInChildren<Renderer>();
+            }
+
+            if (bodyRenderer != null)
+            {
+                worldCenter = bodyRenderer.bounds.center;
+            }
+
+            Vector3 screenPoint = mainCamera.WorldToScreenPoint(worldCenter);
+            bool isVisible = screenPoint.z > 0f &&
+                             screenPoint.x >= -40f && screenPoint.x <= Screen.width + 40f &&
+                             screenPoint.y >= -40f && screenPoint.y <= Screen.height + 40f;
+
+            labelText.gameObject.SetActive(isVisible);
+            if (!isVisible)
+            {
+                continue;
+            }
+
+            float bodyScreenRadius = 0f;
+            if (bodyRenderer != null)
+            {
+                Vector3 edgeWorldPoint = worldCenter + mainCamera.transform.right * bodyRenderer.bounds.extents.magnitude;
+                Vector3 edgeScreenPoint = mainCamera.WorldToScreenPoint(edgeWorldPoint);
+                if (edgeScreenPoint.z > 0f)
+                {
+                    bodyScreenRadius = Mathf.Abs(edgeScreenPoint.x - screenPoint.x);
+                }
+            }
+
+            Vector3 labelScreenPoint = screenPoint + new Vector3(bodyScreenRadius, bodyScreenRadius * 0.35f, 0f) + (Vector3)solarSystemLabelScreenOffset;
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect,
+                labelScreenPoint,
+                solarSystemCanvas != null && solarSystemCanvas.renderMode != RenderMode.ScreenSpaceOverlay ? solarSystemCanvas.worldCamera : null,
+                out Vector2 localPoint);
+
+            labelText.rectTransform.anchoredPosition = localPoint;
+        }
     }
 
     private static Vector2? GetPointerDownPosition()
@@ -798,6 +1221,8 @@ public class PlanetInfoUI : MonoBehaviour
 
     private void HandleFocusBackButton()
     {
+        CloseGalleryOverlays();
+
         if (currentBody == null)
         {
             if (panel != null)
@@ -817,6 +1242,7 @@ public class PlanetInfoUI : MonoBehaviour
 
         UpdateCelestialBodyImage(null);
         SetCelestialMotionEnabled(true);
+        SetOrbitLinesVisible(true);
         SetSimulationControlsVisible(true);
 
         if (orbitCamera != null)
@@ -827,6 +1253,9 @@ public class PlanetInfoUI : MonoBehaviour
 
     private void HandleCelestialBodyBackButton()
     {
+        CloseGalleryOverlays();
+        UpdateInspectCameraPanelOffset(false);
+
         if (celestialBodyUiRoot != null)
         {
             celestialBodyUiRoot.SetActive(false);
@@ -845,6 +1274,8 @@ public class PlanetInfoUI : MonoBehaviour
             currentBody = FindBodyByName("Sun");
         }
 
+        CloseGalleryOverlays();
+
         if (celestialBodyUiRoot != null)
         {
             celestialBodyUiRoot.SetActive(true);
@@ -855,17 +1286,11 @@ public class PlanetInfoUI : MonoBehaviour
             solarSystemUiRoot.SetActive(false);
         }
 
+        ShowBasicsTab(true);
         Canvas.ForceUpdateCanvases();
         UpdateFocusedUi();
-
-        if (activeSection.HasValue)
-        {
-            SetActiveSection(activeSection.Value);
-        }
-        else
-        {
-            SetActiveSection(CelestialSection.PlanetaryProfile);
-        }
+        SetActiveSection(CelestialSection.PlanetaryProfile);
+        UpdateInspectCameraPanelOffset(true);
 
         if (visitRefreshCoroutine != null)
         {
@@ -958,6 +1383,33 @@ public class PlanetInfoUI : MonoBehaviour
         celestialProfileButtonImage.SetAllDirty();
     }
 
+    private void UpdateArPlanetIcon(CelestialBody body)
+    {
+        if (arPlanetIcon == null)
+        {
+            return;
+        }
+
+        if (body == null || string.IsNullOrWhiteSpace(body.bodyName))
+        {
+            arPlanetIcon.enabled = false;
+            return;
+        }
+
+        Sprite bodySprite = FindBodySprite(body.bodyName);
+        if (bodySprite == null)
+        {
+            arPlanetIcon.enabled = false;
+            return;
+        }
+
+        arPlanetIcon.sprite = bodySprite;
+        arPlanetIcon.overrideSprite = bodySprite;
+        arPlanetIcon.enabled = true;
+        arPlanetIcon.preserveAspect = true;
+        arPlanetIcon.SetAllDirty();
+    }
+
     private void UpdateFocusedUi()
     {
         string bodyName = currentBody != null ? currentBody.bodyName : string.Empty;
@@ -974,8 +1426,14 @@ public class PlanetInfoUI : MonoBehaviour
 
         UpdateCelestialBodyImage(currentBody);
         UpdateCelestialProfileButtonImage(currentBody);
+        UpdateArPlanetIcon(currentBody);
         UpdatePlanetaryProfileContent(currentBody);
         UpdateStatsContent(currentBody);
+        UpdateOrbitCharacteristicsContent(currentBody);
+        UpdateStructureContent(currentBody);
+        UpdateAtmosphereContent(currentBody);
+        UpdateGalleryContent(currentBody);
+        UpdateSectionAvailability(currentBody);
         ResetAllScrollPositions();
     }
 
@@ -1054,6 +1512,118 @@ public class PlanetInfoUI : MonoBehaviour
         RebuildStatsLayout();
     }
 
+    private void UpdateOrbitCharacteristicsContent(CelestialBody body)
+    {
+        if (orbitCharacteristicsDescriptionText != null)
+        {
+            orbitCharacteristicsDescriptionText.text = body != null ? body.orbitCharacteristicsDescription : string.Empty;
+            RefreshScrollableTextLayout(orbitCharacteristicsDescriptionText, orbitCharacteristicsScrollRect);
+        }
+    }
+
+    private void UpdateStructureContent(CelestialBody body)
+    {
+        if (structureDescriptionText != null)
+        {
+            structureDescriptionText.text = body != null ? body.structureDescription : string.Empty;
+            RefreshScrollableTextLayout(structureDescriptionText, structureScrollRect);
+        }
+    }
+
+    private void UpdateAtmosphereContent(CelestialBody body)
+    {
+        if (atmosphereMainImageContent != null)
+        {
+            if (body != null && body.atmosphereImage != null)
+            {
+                atmosphereMainImageContent.sprite = body.atmosphereImage;
+                atmosphereMainImageContent.overrideSprite = body.atmosphereImage;
+                atmosphereMainImageContent.enabled = true;
+                atmosphereMainImageContent.preserveAspect = false;
+                ApplyCoverImageSizing(body.atmosphereImage, atmosphereMainImage.rectTransform, atmosphereMainImageContent.rectTransform);
+                atmosphereMainImageContent.SetAllDirty();
+            }
+            else
+            {
+                atmosphereMainImageContent.enabled = false;
+            }
+        }
+
+        if (atmosphereDescriptionText != null)
+        {
+            atmosphereDescriptionText.text = body != null ? body.atmosphereDescription : string.Empty;
+            RefreshScrollableTextLayout(atmosphereDescriptionText, atmosphereScrollRect);
+        }
+    }
+
+    private void UpdateGalleryContent(CelestialBody body)
+    {
+        if (imagesGalleryOverlay != null && imagesGalleryOverlay.activeInHierarchy)
+        {
+            PopulateGalleryForCurrentBody();
+        }
+
+        if (imageViewerOverlay != null && imageViewerOverlay.activeInHierarchy)
+        {
+            if (body == null || body.galleryEntries == null || body.galleryEntries.Count == 0)
+            {
+                HandleGalleryBackButton();
+                return;
+            }
+
+            currentGalleryIndex = Mathf.Clamp(currentGalleryIndex, 0, body.galleryEntries.Count - 1);
+            ShowGalleryEntry(currentGalleryIndex);
+        }
+    }
+
+    private void UpdateSectionAvailability(CelestialBody body)
+    {
+        bool hasOrbitCharacteristics = body != null && !string.IsNullOrWhiteSpace(body.orbitCharacteristicsDescription);
+
+        if (orbitCharacteristicsButton != null)
+        {
+            orbitCharacteristicsButton.gameObject.SetActive(hasOrbitCharacteristics);
+        }
+
+        if (activeSection == CelestialSection.OrbitCharacteristics && !hasOrbitCharacteristics)
+        {
+            SetActiveSection(CelestialSection.PlanetaryProfile);
+        }
+    }
+
+    private static void RefreshScrollableTextLayout(TMP_Text textComponent, ScrollRect scrollRect)
+    {
+        if (textComponent == null)
+        {
+            return;
+        }
+
+        textComponent.ForceMeshUpdate();
+
+        RectTransform textRect = textComponent.rectTransform;
+        Vector2 preferredValues = textComponent.GetPreferredValues(textComponent.text, textRect.rect.width, 0f);
+        float targetHeight = Mathf.Max(preferredValues.y, 1f);
+        textRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, targetHeight);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(textRect);
+
+        if (scrollRect != null)
+        {
+            if (scrollRect.content != null)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(scrollRect.content);
+            }
+
+            RectTransform scrollRectTransform = scrollRect.transform as RectTransform;
+            if (scrollRectTransform != null)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(scrollRectTransform);
+            }
+        }
+
+        Canvas.ForceUpdateCanvases();
+    }
+
     private void ClearGeneratedStatRows()
     {
         for (int i = 0; i < generatedStatRows.Count; i++)
@@ -1065,6 +1635,167 @@ public class PlanetInfoUI : MonoBehaviour
         }
 
         generatedStatRows.Clear();
+    }
+
+    private void ClearGeneratedGalleryItems()
+    {
+        for (int i = 0; i < generatedGalleryItems.Count; i++)
+        {
+            if (generatedGalleryItems[i] != null)
+            {
+                Destroy(generatedGalleryItems[i]);
+            }
+        }
+
+        generatedGalleryItems.Clear();
+    }
+
+    private void PopulateGalleryForCurrentBody()
+    {
+        if (galleryContent == null || galleryItemTemplate == null)
+        {
+            return;
+        }
+
+        ClearGeneratedGalleryItems();
+
+        if (currentBody == null || currentBody.galleryEntries == null || currentBody.galleryEntries.Count == 0)
+        {
+            RebuildGalleryLayout();
+            return;
+        }
+
+        for (int i = 0; i < currentBody.galleryEntries.Count; i++)
+        {
+            CelestialGalleryEntry galleryEntry = currentBody.galleryEntries[i];
+            GameObject itemObject = Instantiate(galleryItemTemplate, galleryContent, false);
+            itemObject.name = $"{galleryItemTemplate.name}_{i}";
+            itemObject.SetActive(true);
+
+            Image thumbnailImage = FindComponentInChildrenByName<Image>(itemObject, "ThumbnailImage") ?? galleryItemTemplateThumbnailImage;
+            if (thumbnailImage != null)
+            {
+                thumbnailImage.sprite = galleryEntry != null ? galleryEntry.image : null;
+                thumbnailImage.overrideSprite = galleryEntry != null ? galleryEntry.image : null;
+                thumbnailImage.enabled = galleryEntry != null && galleryEntry.image != null;
+                thumbnailImage.preserveAspect = true;
+                thumbnailImage.SetAllDirty();
+            }
+
+            Button itemButton = itemObject.GetComponent<Button>();
+            if (itemButton != null)
+            {
+                int entryIndex = i;
+                itemButton.onClick.RemoveAllListeners();
+                itemButton.onClick.AddListener(() => OpenGalleryEntry(entryIndex));
+            }
+
+            generatedGalleryItems.Add(itemObject);
+        }
+
+        RebuildGalleryLayout();
+    }
+
+    private void RebuildGalleryLayout()
+    {
+        Canvas.ForceUpdateCanvases();
+
+        if (galleryContent != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(galleryContent);
+        }
+
+        if (galleryScrollRect != null)
+        {
+            RectTransform scrollRectTransform = galleryScrollRect.transform as RectTransform;
+            if (scrollRectTransform != null)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(scrollRectTransform);
+            }
+
+            galleryScrollRect.verticalNormalizedPosition = 1f;
+        }
+
+        Canvas.ForceUpdateCanvases();
+    }
+
+    private void OpenGalleryEntry(int index)
+    {
+        if (currentBody == null || currentBody.galleryEntries == null || currentBody.galleryEntries.Count == 0)
+        {
+            return;
+        }
+
+        currentGalleryIndex = Mathf.Clamp(index, 0, currentBody.galleryEntries.Count - 1);
+
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(false);
+        }
+
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(true);
+        }
+
+        ShowGalleryEntry(currentGalleryIndex);
+    }
+
+    private void ShowAdjacentGalleryEntry(int direction)
+    {
+        if (currentBody == null || currentBody.galleryEntries == null || currentBody.galleryEntries.Count == 0)
+        {
+            return;
+        }
+
+        if (currentGalleryIndex < 0)
+        {
+            currentGalleryIndex = 0;
+        }
+        else
+        {
+            currentGalleryIndex = (currentGalleryIndex + direction + currentBody.galleryEntries.Count) % currentBody.galleryEntries.Count;
+        }
+
+        ShowGalleryEntry(currentGalleryIndex);
+    }
+
+    private void ShowGalleryEntry(int index)
+    {
+        if (currentBody == null || currentBody.galleryEntries == null || currentBody.galleryEntries.Count == 0)
+        {
+            return;
+        }
+
+        int safeIndex = Mathf.Clamp(index, 0, currentBody.galleryEntries.Count - 1);
+        CelestialGalleryEntry galleryEntry = currentBody.galleryEntries[safeIndex];
+        currentGalleryIndex = safeIndex;
+
+        if (viewerImageTitleText != null)
+        {
+            viewerImageTitleText.text = galleryEntry != null ? galleryEntry.title : string.Empty;
+        }
+
+        if (viewerDescriptionText != null)
+        {
+            viewerDescriptionText.text = galleryEntry != null ? galleryEntry.description : string.Empty;
+        }
+
+        if (viewerMainImage != null)
+        {
+            if (galleryEntry != null && galleryEntry.image != null)
+            {
+                viewerMainImage.sprite = galleryEntry.image;
+                viewerMainImage.overrideSprite = galleryEntry.image;
+                viewerMainImage.enabled = true;
+                viewerMainImage.preserveAspect = true;
+                viewerMainImage.SetAllDirty();
+            }
+            else
+            {
+                viewerMainImage.enabled = false;
+            }
+        }
     }
 
     private void RebuildStatsLayout()
@@ -1193,6 +1924,50 @@ public class PlanetInfoUI : MonoBehaviour
         planetaryProfileMainImageContent.preserveAspect = false;
     }
 
+    private void EnsureAtmosphereCoverImage()
+    {
+        if (atmosphereMainImage == null)
+        {
+            return;
+        }
+
+        RectMask2D rectMask = atmosphereMainImage.GetComponent<RectMask2D>();
+        if (rectMask == null)
+        {
+            rectMask = atmosphereMainImage.gameObject.AddComponent<RectMask2D>();
+        }
+
+        atmosphereMainImage.raycastTarget = false;
+        atmosphereMainImage.color = new Color(1f, 1f, 1f, 0f);
+        atmosphereMainImage.sprite = null;
+        atmosphereMainImage.overrideSprite = null;
+
+        Transform existingChild = atmosphereMainImage.transform.Find("CoverImage");
+        if (existingChild != null)
+        {
+            atmosphereMainImageContent = existingChild.GetComponent<Image>();
+        }
+
+        if (atmosphereMainImageContent == null)
+        {
+            GameObject coverImageObject = new GameObject("CoverImage", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            coverImageObject.layer = atmosphereMainImage.gameObject.layer;
+            coverImageObject.transform.SetParent(atmosphereMainImage.transform, false);
+            atmosphereMainImageContent = coverImageObject.GetComponent<Image>();
+        }
+
+        RectTransform coverRect = atmosphereMainImageContent.rectTransform;
+        coverRect.anchorMin = new Vector2(0.5f, 1f);
+        coverRect.anchorMax = new Vector2(0.5f, 1f);
+        coverRect.pivot = new Vector2(0.5f, 1f);
+        coverRect.anchoredPosition = Vector2.zero;
+        coverRect.localScale = Vector3.one;
+
+        atmosphereMainImageContent.raycastTarget = false;
+        atmosphereMainImageContent.type = Image.Type.Simple;
+        atmosphereMainImageContent.preserveAspect = false;
+    }
+
     private void ApplyCoverImageSizing(Sprite sprite)
     {
         if (planetaryProfileMainImage == null || planetaryProfileMainImageContent == null || sprite == null)
@@ -1200,8 +1975,16 @@ public class PlanetInfoUI : MonoBehaviour
             return;
         }
 
-        RectTransform containerRect = planetaryProfileMainImage.rectTransform;
-        RectTransform coverRect = planetaryProfileMainImageContent.rectTransform;
+        ApplyCoverImageSizing(sprite, planetaryProfileMainImage.rectTransform, planetaryProfileMainImageContent.rectTransform);
+    }
+
+    private void ApplyCoverImageSizing(Sprite sprite, RectTransform containerRect, RectTransform coverRect)
+    {
+        if (containerRect == null || coverRect == null || sprite == null)
+        {
+            return;
+        }
+
         Rect container = containerRect.rect;
 
         if (container.width <= 0f || container.height <= 0f)
@@ -1384,7 +2167,14 @@ public class PlanetInfoUI : MonoBehaviour
 
         UpdateFocusedUi();
 
+        if (celestialBodyUiRoot != null && celestialBodyUiRoot.activeInHierarchy)
+        {
+            ShowBasicsTab(true);
+            SetActiveSection(CelestialSection.PlanetaryProfile);
+        }
+
         SetCelestialMotionEnabled(false);
+        SetOrbitLinesVisible(false);
         SetSimulationControlsVisible(false);
 
         body.ResetToDefaultOrientation();
@@ -1403,6 +2193,8 @@ public class PlanetInfoUI : MonoBehaviour
                 maxFocusDistance,
                 defaultViewRotation);
         }
+
+        UpdateInspectCameraPanelOffset(activeSection.HasValue);
     }
 
     private void HandlePlanetaryProfileButton()
@@ -1430,6 +2222,94 @@ public class PlanetInfoUI : MonoBehaviour
         ToggleSection(CelestialSection.Atmosphere);
     }
 
+    private void HandleBasicsButton()
+    {
+        ShowBasicsTab(true);
+        SetActiveSection(CelestialSection.PlanetaryProfile);
+    }
+
+    private void HandleExtrasButton()
+    {
+        ShowExtrasTab(true);
+        SetActiveSection(CelestialSection.Structure);
+    }
+
+    private void HandleImagesButton()
+    {
+        if (currentBody == null)
+        {
+            return;
+        }
+
+        PopulateGalleryForCurrentBody();
+
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(true);
+        }
+
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(false);
+        }
+
+        UpdateInspectCameraPanelOffset(false);
+    }
+
+    private void HandleGalleryBackButton()
+    {
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(false);
+        }
+
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(false);
+        }
+
+        currentGalleryIndex = -1;
+        UpdateInspectCameraPanelOffset(activeSection.HasValue);
+    }
+
+    private void HandleViewerCloseButton()
+    {
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(false);
+        }
+
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(true);
+        }
+    }
+
+    private void HandleViewerPreviousButton()
+    {
+        ShowAdjacentGalleryEntry(-1);
+    }
+
+    private void HandleViewerNextButton()
+    {
+        ShowAdjacentGalleryEntry(1);
+    }
+
+    private void CloseGalleryOverlays()
+    {
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(false);
+        }
+
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(false);
+        }
+
+        currentGalleryIndex = -1;
+    }
+
     private void HandleHidePanelButton()
     {
         HideActiveSection();
@@ -1455,6 +2335,28 @@ public class PlanetInfoUI : MonoBehaviour
         foreach (PlanetRotation rotationScript in rotationScripts)
         {
             rotationScript.enabled = isEnabled;
+        }
+    }
+
+    private void SetOrbitLinesVisible(bool isVisible)
+    {
+        if (orbitSnakeTrails == null)
+        {
+            return;
+        }
+
+        foreach (OrbitSnakeTrail orbitSnakeTrail in orbitSnakeTrails)
+        {
+            if (orbitSnakeTrail == null)
+            {
+                continue;
+            }
+
+            LineRenderer lineRenderer = orbitSnakeTrail.GetComponent<LineRenderer>();
+            if (lineRenderer != null)
+            {
+                lineRenderer.enabled = isVisible;
+            }
         }
     }
 
@@ -1861,6 +2763,7 @@ public class PlanetInfoUI : MonoBehaviour
         {
             activeSection = null;
             UpdateNavigationButtonVisuals(null);
+            UpdateInspectCameraPanelOffset(false);
             return;
         }
 
@@ -1872,6 +2775,7 @@ public class PlanetInfoUI : MonoBehaviour
         sectionAnimationCoroutine = StartCoroutine(AnimateSectionOut(activePanel));
         activeSection = null;
         UpdateNavigationButtonVisuals(null);
+        UpdateInspectCameraPanelOffset(false);
     }
 
     private void ToggleCelestialBodyUiVisibility()
@@ -1892,6 +2796,9 @@ public class PlanetInfoUI : MonoBehaviour
 
     private void HideCelestialBodyUi()
     {
+        CloseGalleryOverlays();
+        UpdateInspectCameraPanelOffset(false);
+
         if (celestialBodyUiRoot == null || hideUnhideButton == null)
         {
             return;
@@ -1941,6 +2848,7 @@ public class PlanetInfoUI : MonoBehaviour
         }
 
         hiddenUiStateMap.Clear();
+        UpdateInspectCameraPanelOffset(activeSection.HasValue);
     }
 
     private void UpdateHideUnhideIcon()
@@ -2032,6 +2940,27 @@ public class PlanetInfoUI : MonoBehaviour
 
         activeSection = section;
         UpdateNavigationButtonVisuals(section);
+        UpdateInspectCameraPanelOffset(true);
+    }
+
+    private void UpdateInspectCameraPanelOffset(bool isPanelVisible)
+    {
+        if (orbitCamera == null)
+        {
+            return;
+        }
+
+        bool shouldOffset =
+            isPanelVisible &&
+            currentBody != null &&
+            celestialBodyUiRoot != null &&
+            celestialBodyUiRoot.activeInHierarchy &&
+            !isCelestialBodyUiHidden &&
+            (imagesGalleryOverlay == null || !imagesGalleryOverlay.activeInHierarchy) &&
+            (imageViewerOverlay == null || !imageViewerOverlay.activeInHierarchy) &&
+            showBasicsTab;
+
+        orbitCamera.SetInspectViewOffsetEnabled(shouldOffset);
     }
 
     private static void SetSectionVisible(GameObject sectionObject, bool isVisible)
@@ -2266,6 +3195,25 @@ public class PlanetInfoUI : MonoBehaviour
         DisableNavigationButtonTransitions();
     }
 
+    private void CacheBottomTabVisualDefaults()
+    {
+        CacheButtonGraphics(basicsButton);
+        CacheButtonGraphics(extrasButton);
+
+        if (basicsButtonFill != null)
+        {
+            basicsButtonFillOriginalColor = basicsButtonFill.color;
+        }
+
+        if (extrasButtonFill != null)
+        {
+            extrasButtonFillOriginalColor = extrasButtonFill.color;
+        }
+
+        DisableButtonTransition(basicsButton);
+        DisableButtonTransition(extrasButton);
+    }
+
     private void CacheButtonGraphics(Button button)
     {
         if (button == null)
@@ -2315,6 +3263,53 @@ public class PlanetInfoUI : MonoBehaviour
         SetNavigationButtonVisual(orbitCharacteristicsButton, selectedSection == CelestialSection.OrbitCharacteristics);
         SetNavigationButtonVisual(structureButton, selectedSection == CelestialSection.Structure);
         SetNavigationButtonVisual(atmosphereButton, selectedSection == CelestialSection.Atmosphere);
+    }
+
+    private void ShowBasicsTab(bool refreshSectionAvailability)
+    {
+        showBasicsTab = true;
+        UpdateBottomTabVisuals();
+
+        if (refreshSectionAvailability)
+        {
+            UpdateSectionAvailability(currentBody);
+        }
+    }
+
+    private void ShowExtrasTab(bool refreshSectionAvailability)
+    {
+        showBasicsTab = false;
+        UpdateBottomTabVisuals();
+
+        if (refreshSectionAvailability)
+        {
+            UpdateSectionAvailability(currentBody);
+        }
+    }
+
+    private void UpdateBottomTabVisuals()
+    {
+        if (basicsGroup != null)
+        {
+            basicsGroup.SetActive(showBasicsTab);
+        }
+
+        if (extrasGroup != null)
+        {
+            extrasGroup.SetActive(!showBasicsTab);
+        }
+
+        if (basicsButtonFill != null)
+        {
+            basicsButtonFill.color = showBasicsTab ? activeBottomTabFillColor : basicsButtonFillOriginalColor;
+            basicsButtonFill.SetAllDirty();
+        }
+
+        if (extrasButtonFill != null)
+        {
+            extrasButtonFill.color = showBasicsTab ? extrasButtonFillOriginalColor : activeBottomTabFillColor;
+            extrasButtonFill.SetAllDirty();
+        }
     }
 
     private void SetNavigationButtonVisual(Button button, bool isActive)

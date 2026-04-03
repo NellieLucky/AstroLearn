@@ -9,9 +9,21 @@ public class CelestialStatEntry
     public string value;
 }
 
+[Serializable]
+public class CelestialGalleryEntry
+{
+    public Sprite image;
+    public string title;
+    [TextArea(3, 10)]
+    public string description;
+}
+
 public class CelestialBody : MonoBehaviour
 {
     public string bodyName;
+
+    [Header("Solar System Label")]
+    public Color labelColor = Color.white;
 
     [Header("Planetary Profile")]
     public Sprite profileImage;
@@ -21,12 +33,29 @@ public class CelestialBody : MonoBehaviour
     [Header("Stats")]
     public List<CelestialStatEntry> stats = new List<CelestialStatEntry>();
 
+    [Header("Orbit Characteristics")]
+    [TextArea(5, 20)]
+    public string orbitCharacteristicsDescription;
+
+    [Header("Solid Core")]
+    [TextArea(5, 20)]
+    public string structureDescription;
+
+    [Header("Atmosphere")]
+    public Sprite atmosphereImage;
+    [TextArea(5, 20)]
+    public string atmosphereDescription;
+
     [Header("Focus Camera")]
     public float focusDistanceOverride;
     public float minFocusDistanceOverride;
     public float maxFocusDistanceOverride = 30f;
 
     private Quaternion defaultWorldRotation;
+
+    [Header("Gallery")]
+    public List<CelestialGalleryEntry> galleryEntries = new List<CelestialGalleryEntry>();
+
 
     private void Awake()
     {

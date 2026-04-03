@@ -17,6 +17,12 @@ public class MobileOrbitCamera : MonoBehaviour
     public float maxVerticalAngle = 75f;
     public bool allowFullVerticalOrbit = true;
 
+    [Header("Startup View")]
+    public bool useStartupView = true;
+    public float startupYaw = -25f;
+    public float startupPitch = 18f;
+    public float startupDistance = 12f;
+
     [Header("Zoom")]
     public float pinchZoomSpeed = 0.02f;
     public float scrollZoomSpeed = 6f;
@@ -27,6 +33,10 @@ public class MobileOrbitCamera : MonoBehaviour
 
     [Header("Clipping")]
     public float inspectNearClipPlane = 0.001f;
+
+    [Header("Inspect Framing")]
+    public Vector2 inspectViewOffset = new Vector2(-0.35f, 0f);
+    public float inspectViewOffsetSmoothTime = 0.2f;
 
     private float yaw;
     private float pitch = 10f;
@@ -49,6 +59,9 @@ public class MobileOrbitCamera : MonoBehaviour
     private Quaternion currentOrbitRotation;
     private Quaternion inspectStartRotation;
     private float inspectStartDistance;
+    private Vector2 currentViewOffset;
+    private Vector2 targetViewOffset;
+    private Vector2 viewOffsetVelocity;
 
     private void Start()
     {
@@ -72,6 +85,15 @@ public class MobileOrbitCamera : MonoBehaviour
         pitch = NormalizeAngle(angles.x);
         pitch = Mathf.Clamp(pitch, minVerticalAngle, maxVerticalAngle);
 
+        if (useStartupView)
+        {
+            yaw = startupYaw;
+            pitch = allowFullVerticalOrbit
+                ? startupPitch
+                : Mathf.Clamp(startupPitch, minVerticalAngle, maxVerticalAngle);
+            distance = Mathf.Clamp(startupDistance, minDistance, maxDistance);
+        }
+
         defaultTarget = target;
         defaultDistance = distance;
         defaultMinDistance = minDistance;
@@ -82,6 +104,8 @@ public class MobileOrbitCamera : MonoBehaviour
         currentTargetPosition = target.position;
         orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
         currentOrbitRotation = orbitRotation;
+        currentViewOffset = Vector2.zero;
+        targetViewOffset = Vector2.zero;
 
         UpdateCameraPosition();
     }
@@ -153,6 +177,13 @@ public class MobileOrbitCamera : MonoBehaviour
             transitionSmoothTime,
             Mathf.Infinity,
             deltaTime);
+        currentViewOffset = Vector2.SmoothDamp(
+            currentViewOffset,
+            targetViewOffset,
+            ref viewOffsetVelocity,
+            inspectViewOffsetSmoothTime,
+            Mathf.Infinity,
+            deltaTime);
 
         float rotationLerp = transitionSmoothTime <= 0.0001f
             ? 1f
@@ -160,9 +191,13 @@ public class MobileOrbitCamera : MonoBehaviour
         currentOrbitRotation = Quaternion.Slerp(currentOrbitRotation, orbitRotation, rotationLerp);
 
         Vector3 offset = currentOrbitRotation * new Vector3(0f, 0f, -currentDistance);
+        Vector3 lookOffset =
+            (currentOrbitRotation * Vector3.right) * (currentDistance * currentViewOffset.x) +
+            (currentOrbitRotation * Vector3.up) * (currentDistance * currentViewOffset.y);
+        Vector3 lookTargetPosition = currentTargetPosition + lookOffset;
 
         transform.position = currentTargetPosition + offset;
-        transform.rotation = Quaternion.LookRotation((currentTargetPosition - transform.position).normalized, currentOrbitRotation * Vector3.up);
+        transform.rotation = Quaternion.LookRotation((lookTargetPosition - transform.position).normalized, currentOrbitRotation * Vector3.up);
     }
 
     private void HandleMouseRotation()
@@ -336,6 +371,7 @@ public class MobileOrbitCamera : MonoBehaviour
         orbitRotation = startViewRotation;
         inspectStartRotation = orbitRotation;
         inspectStartDistance = distance;
+        targetViewOffset = Vector2.zero;
 
         if (cachedCamera != null)
         {
@@ -368,6 +404,7 @@ public class MobileOrbitCamera : MonoBehaviour
         yaw = defaultYaw;
         pitch = defaultPitch;
         orbitRotation = Quaternion.Euler(defaultPitch, defaultYaw, 0f);
+        targetViewOffset = Vector2.zero;
 
         if (cachedCamera != null)
         {
@@ -397,5 +434,10 @@ public class MobileOrbitCamera : MonoBehaviour
         }
 
         pitch = Mathf.Clamp(pitch, minVerticalAngle, maxVerticalAngle);
+    }
+
+    public void SetInspectViewOffsetEnabled(bool isEnabled)
+    {
+        targetViewOffset = isEnabled && inspectMode ? inspectViewOffset : Vector2.zero;
     }
 }
