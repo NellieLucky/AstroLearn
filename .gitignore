@@ -30,3 +30,4 @@ MemoryCaptures/
 Recordings/
 Assets/AssetStoreTools*
 .plastic/
+.env

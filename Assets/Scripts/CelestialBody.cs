@@ -46,6 +46,9 @@ public class CelestialBody : MonoBehaviour
     [TextArea(5, 20)]
     public string atmosphereDescription;
 
+    [Header("Audio")]
+    public string soundTitle;
+
     [Header("Focus Camera")]
     public float focusDistanceOverride;
     public float minFocusDistanceOverride;
