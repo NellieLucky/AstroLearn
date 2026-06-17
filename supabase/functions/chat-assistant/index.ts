@@ -91,12 +91,24 @@ const BLOCKED_TERMS = [
   "suicide",
   "hate",
   "racist",
+  "gago",
+  "tanga",
+  "bobo",
+  "ulol",
+  "putang",
+  "puta",
+  "pakyu",
+  "fuck",
+  "shit",
+  "bitch",
+  "asshole",
 ];
 
 const FRIENDLY_SHORT_PROMPTS = ["hi", "hello", "hey", "help", "what can you do"];
 
 function isMessageInScope(message: string): boolean {
   const normalized = message.trim().toLowerCase();
+  const compactNormalized = compactScopeText(normalized);
   if (!normalized) {
     return false;
   }
@@ -109,7 +121,7 @@ function isMessageInScope(message: string): boolean {
     return true;
   }
 
-  if (SPACE_KEYWORDS.some((keyword) => normalized.includes(keyword))) {
+  if (SPACE_KEYWORDS.some((keyword) => normalized.includes(keyword) || compactNormalized.includes(compactScopeText(keyword)))) {
     return true;
   }
 
@@ -131,6 +143,14 @@ function buildOffTopicReply(language: string): string {
   }
 
   return "I can only help with space-related topics like planets, moons, stars, galaxies, the Solar System, and astronomy. Please ask something within that scope.";
+}
+
+function buildBlockedLanguageReply(language: string): string {
+  if (isTagalogLanguage(language)) {
+    return "Pakiusap, iwasan natin ang bastos o mapanirang salita. Kung gusto mo, maaari kitang tulungan sa maayos na tanong tungkol sa space o astronomy.";
+  }
+
+  return "Please avoid rude or offensive language. If you want, I can still help with a respectful question about space or astronomy.";
 }
 
 function stripCodeFences(raw: string): string {
@@ -219,10 +239,10 @@ function isTagalogLanguage(language: string): boolean {
 }
 
 function areCloseKeywordMatch(token: string, keyword: string): boolean {
-  const normalizedToken = token.trim().toLowerCase();
-  const normalizedKeyword = keyword.trim().toLowerCase();
+  const normalizedToken = compactScopeText(token);
+  const normalizedKeyword = compactScopeText(keyword);
 
-  if (!normalizedToken || !normalizedKeyword || normalizedKeyword.includes(" ")) {
+  if (!normalizedToken || !normalizedKeyword) {
     return false;
   }
 
@@ -239,6 +259,12 @@ function areCloseKeywordMatch(token: string, keyword: string): boolean {
   }
 
   return computeEditDistance(normalizedToken, normalizedKeyword) <= 1;
+}
+
+function compactScopeText(value: string): string {
+  return (value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
 }
 
 function computeEditDistance(a: string, b: string): number {
@@ -298,6 +324,10 @@ Deno.serve(async (request) => {
         : "English";
 
     return Response.json({ reply: buildLanguagePreferenceReply(targetLanguage) }, { headers: corsHeaders });
+  }
+
+  if (BLOCKED_TERMS.some((term) => latestMessage.toLowerCase().includes(term))) {
+    return Response.json({ reply: buildBlockedLanguageReply(preferredLanguage) }, { headers: corsHeaders });
   }
 
   if (!isMessageInScope(latestMessage)) {

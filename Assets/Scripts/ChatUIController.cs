@@ -37,12 +37,16 @@ public class ChatUIController : MonoBehaviour
 
     private readonly List<GameObject> spawnedMessageItems = new List<GameObject>();
     private readonly List<GameObject> spawnedHistoryItems = new List<GameObject>();
+    private GameObject greetingPlaceholderRow;
+    private GameObject greetingPlaceholderItem;
 
     private ChatSessionCollection sessions;
     private ChatSessionData currentSession;
     private bool isWaitingForReply;
     private bool lastCloudRequestRateLimited;
+    private bool lastMessagesContentOverflows;
     private Coroutine thinkingAnimationCoroutine;
+    private Coroutine pendingScrollCoroutine;
     private static List<string> cachedScopeKeywords;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -227,6 +231,8 @@ public class ChatUIController : MonoBehaviour
         {
             botMessageTemplate.SetActive(false);
         }
+
+        EnsureGreetingPlaceholder();
     }
 
     private void ConfigureContentLayouts()
@@ -272,13 +278,15 @@ public class ChatUIController : MonoBehaviour
             return;
         }
 
+        NormalizeMessagesContentRect();
+
         VerticalLayoutGroup layout = messagesContent.GetComponent<VerticalLayoutGroup>();
         if (layout == null)
         {
             layout = messagesContent.gameObject.AddComponent<VerticalLayoutGroup>();
         }
 
-        layout.childAlignment = TextAnchor.LowerLeft;
+        layout.childAlignment = TextAnchor.UpperLeft;
         layout.childControlWidth = true;
         layout.childControlHeight = false;
         layout.childForceExpandWidth = true;
@@ -303,12 +311,40 @@ public class ChatUIController : MonoBehaviour
         layoutElement.minHeight = 0f;
     }
 
+    private void NormalizeMessagesContentRect()
+    {
+        if (messagesContent == null)
+        {
+            return;
+        }
+
+        messagesContent.localScale = Vector3.one;
+        messagesContent.anchorMin = new Vector2(0f, 1f);
+        messagesContent.anchorMax = new Vector2(1f, 1f);
+        messagesContent.pivot = new Vector2(0.5f, 1f);
+        messagesContent.anchoredPosition = Vector2.zero;
+        messagesContent.sizeDelta = Vector2.zero;
+
+        if (messagesScrollRect != null)
+        {
+            messagesScrollRect.content = messagesContent;
+        }
+    }
+
     private void LoadSessions()
     {
         sessions = GuestChatStorage.LoadSessions();
         if (sessions.sessions == null)
         {
             sessions.sessions = new List<ChatSessionData>();
+        }
+        else
+        {
+            sessions.sessions = sessions.sessions
+                .Where(ShouldPersistSession)
+                .OrderByDescending(GetSessionSortKey)
+                .Take(MaxStoredSessions)
+                .ToList();
         }
 
         currentSession = FindSessionById(sessions.activeSessionId) ?? FindMostRecentSession();
@@ -328,8 +364,6 @@ public class ChatUIController : MonoBehaviour
     private void HandleNewChatPressed()
     {
         currentSession = CreateEmptySession(GetCurrentLanguage());
-        sessions.activeSessionId = currentSession.sessionId;
-        SaveSessions();
         RenderAll();
 
         if (questionInputField != null)
@@ -362,9 +396,8 @@ public class ChatUIController : MonoBehaviour
     {
         sessions = new ChatSessionCollection();
         currentSession = CreateEmptySession("English");
-        sessions.activeSessionId = currentSession.sessionId;
+        sessions.activeSessionId = string.Empty;
         GuestChatStorage.ClearSessions();
-        SaveSessions();
         RenderAll();
     }
 
@@ -381,8 +414,8 @@ public class ChatUIController : MonoBehaviour
             return;
         }
 
-        EnsureCurrentSessionTracked();
         AddMessageToCurrentSession("user", message);
+        EnsureCurrentSessionTracked();
         UpdateSessionTitleFromMessage(message);
         SaveSessions();
         RenderAll();
@@ -392,6 +425,14 @@ public class ChatUIController : MonoBehaviour
 
         if (TryHandleLanguagePreferenceRequest(message))
         {
+            SaveSessions();
+            RenderAll();
+            return;
+        }
+
+        if (ContainsBlockedLanguage(message))
+        {
+            AddMessageToCurrentSession("assistant", BuildBlockedLanguageReply(GetCurrentLanguage()));
             SaveSessions();
             RenderAll();
             return;
@@ -879,13 +920,40 @@ public class ChatUIController : MonoBehaviour
 
     private void SaveSessions()
     {
-        EnsureCurrentSessionTracked();
-        sessions.activeSessionId = currentSession != null ? currentSession.sessionId : string.Empty;
+        if (sessions == null)
+        {
+            sessions = new ChatSessionCollection();
+        }
+
+        if (sessions.sessions == null)
+        {
+            sessions.sessions = new List<ChatSessionData>();
+        }
+
+        if (ShouldPersistSession(currentSession))
+        {
+            EnsureCurrentSessionTracked();
+        }
+
         sessions.sessions = sessions.sessions
-            .Where(session => session != null && session.messages != null && session.messages.Count > 0)
+            .Where(ShouldPersistSession)
             .OrderByDescending(GetSessionSortKey)
             .Take(MaxStoredSessions)
             .ToList();
+
+        if (currentSession != null && ShouldPersistSession(currentSession))
+        {
+            sessions.activeSessionId = currentSession.sessionId;
+        }
+        else if (!string.IsNullOrWhiteSpace(sessions.activeSessionId) &&
+                 sessions.sessions.Any(session => session != null && session.sessionId == sessions.activeSessionId))
+        {
+            // Keep the current persisted selection when the visible session is still just a draft.
+        }
+        else
+        {
+            sessions.activeSessionId = sessions.sessions.FirstOrDefault()?.sessionId ?? string.Empty;
+        }
 
         GuestChatStorage.SaveSessions(sessions);
     }
@@ -909,12 +977,15 @@ public class ChatUIController : MonoBehaviour
     {
         ClearSpawnedItems(spawnedMessageItems);
 
-        if (messagesContent == null || currentSession == null || currentSession.messages == null)
+        if (messagesContent == null || currentSession == null)
         {
+            UpdateGreetingPlaceholder(false);
             return;
         }
 
-        foreach (ChatMessageData message in currentSession.messages)
+        List<ChatMessageData> messagesToRender = GetRenderableMessages(currentSession);
+        UpdateGreetingPlaceholder(messagesToRender.Count == 0);
+        foreach (ChatMessageData message in messagesToRender)
         {
             if (message == null)
             {
@@ -953,7 +1024,7 @@ public class ChatUIController : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(messagesContent);
         EnsureMessagesContentFillsViewport();
         Canvas.ForceUpdateCanvases();
-        ScrollMessagesToBottom();
+        ScheduleMessageScrollToLatest();
     }
 
     private void EnsureMessagesContentFillsViewport()
@@ -972,8 +1043,22 @@ public class ChatUIController : MonoBehaviour
         float viewportHeight = messagesScrollRect.viewport.rect.height;
         float preferredHeight = LayoutUtility.GetPreferredHeight(messagesContent);
         bool contentOverflows = preferredHeight > viewportHeight + 4f;
+        bool hasRealMessages = currentSession != null &&
+            currentSession.messages != null &&
+            currentSession.messages.Any(message => message != null && !string.IsNullOrWhiteSpace(message.text));
+        lastMessagesContentOverflows = contentOverflows;
 
-        layoutElement.minHeight = Mathf.Max(viewportHeight, preferredHeight);
+        VerticalLayoutGroup layout = messagesContent.GetComponent<VerticalLayoutGroup>();
+        if (layout != null)
+        {
+            layout.childAlignment = !contentOverflows && hasRealMessages
+                ? TextAnchor.LowerLeft
+                : TextAnchor.UpperLeft;
+        }
+
+        layoutElement.minHeight = !contentOverflows && hasRealMessages
+            ? viewportHeight
+            : 0f;
         messagesScrollRect.vertical = contentOverflows;
         messagesScrollRect.movementType = contentOverflows ? ScrollRect.MovementType.Elastic : ScrollRect.MovementType.Clamped;
         LayoutRebuilder.ForceRebuildLayoutImmediate(messagesContent);
@@ -1121,6 +1206,7 @@ public class ChatUIController : MonoBehaviour
         sessions.activeSessionId = sessionId;
         SaveSessions();
         RenderAll();
+        ScheduleMessageScrollToLatest();
     }
 
     private void UpdateActionStates()
@@ -1149,6 +1235,7 @@ public class ChatUIController : MonoBehaviour
         }
 
         string normalized = message.ToLowerInvariant();
+        string compactNormalized = CompactScopeText(normalized);
 
         if (IsLanguagePreferenceRequest(normalized))
         {
@@ -1173,7 +1260,7 @@ public class ChatUIController : MonoBehaviour
 
         foreach (string keyword in spaceKeywords)
         {
-            if (normalized.Contains(keyword))
+            if (normalized.Contains(keyword) || compactNormalized.Contains(CompactScopeText(keyword)))
             {
                 return true;
             }
@@ -1199,6 +1286,32 @@ public class ChatUIController : MonoBehaviour
         };
 
         return friendlyShortPrompts.Any(prompt => normalized.Contains(prompt));
+    }
+
+    private bool ContainsBlockedLanguage(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return false;
+        }
+
+        string normalized = message.ToLowerInvariant();
+        string[] blockedTerms =
+        {
+            "sex", "porn", "nude", "kill", "murder", "bomb", "drugs", "suicide", "hate", "racist", "nigga", "nigger", "faggot", "twink",
+            "patayin", "bomba", "droga", "magpakamatay",
+            "gago", "tanga", "bobo", "ulol", "putang", "puta", "pakyu", "fuck", "shit", "bitch", "asshole"
+        };
+
+        foreach (string blocked in blockedTerms)
+        {
+            if (normalized.Contains(blocked))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static List<string> GetScopeKeywords()
@@ -1265,6 +1378,16 @@ public class ChatUIController : MonoBehaviour
         }
 
         return "I can only help with space-related topics like planets, moons, stars, galaxies, the Solar System, and astronomy. Please ask something within that scope.";
+    }
+
+    private string BuildBlockedLanguageReply(string language)
+    {
+        if (IsTagalogLanguage(language))
+        {
+            return "Pakiusap, iwasan natin ang bastos o mapanirang salita. Kung gusto mo, maaari kitang tulungan sa maayos na tanong tungkol sa space o astronomy.";
+        }
+
+        return "Please avoid rude or offensive language. If you want, I can still help with a respectful question about space or astronomy.";
     }
 
     private string BuildFallbackReply(string latestMessage)
@@ -1737,10 +1860,10 @@ public class ChatUIController : MonoBehaviour
             return false;
         }
 
-        string normalizedToken = token.Trim().ToLowerInvariant();
-        string normalizedKeyword = keyword.Trim().ToLowerInvariant();
+        string normalizedToken = CompactScopeText(token);
+        string normalizedKeyword = CompactScopeText(keyword);
 
-        if (normalizedKeyword.Contains(" "))
+        if (string.IsNullOrWhiteSpace(normalizedToken) || string.IsNullOrWhiteSpace(normalizedKeyword))
         {
             return false;
         }
@@ -1762,6 +1885,38 @@ public class ChatUIController : MonoBehaviour
         }
 
         return ComputeEditDistance(normalizedToken, normalizedKeyword) <= 1;
+    }
+
+    private List<ChatMessageData> GetRenderableMessages(ChatSessionData session)
+    {
+        if (session == null || session.messages == null)
+        {
+            return new List<ChatMessageData>();
+        }
+
+        return session.messages
+            .Where(message => message != null && !string.IsNullOrWhiteSpace(message.text))
+            .ToList();
+    }
+
+    private static string CompactScopeText(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        StringBuilder builder = new StringBuilder(value.Length);
+        for (int i = 0; i < value.Length; i++)
+        {
+            char character = char.ToLowerInvariant(value[i]);
+            if (char.IsLetterOrDigit(character))
+            {
+                builder.Append(character);
+            }
+        }
+
+        return builder.ToString();
     }
 
     private static int ComputeEditDistance(string a, string b)
@@ -1859,13 +2014,6 @@ public class ChatUIController : MonoBehaviour
             messages = new List<ChatMessageData>()
         };
 
-        session.messages.Add(new ChatMessageData
-        {
-            role = "assistant",
-            text = BuildWelcomeMessage(session.preferredLanguage),
-            timestampUtc = DateTime.UtcNow.ToString("o")
-        });
-
         return session;
     }
 
@@ -1897,6 +2045,19 @@ public class ChatUIController : MonoBehaviour
             .Where(session => session != null)
             .OrderByDescending(GetSessionSortKey)
             .FirstOrDefault();
+    }
+
+    private static bool ShouldPersistSession(ChatSessionData session)
+    {
+        if (session == null || session.messages == null || session.messages.Count == 0)
+        {
+            return false;
+        }
+
+        return session.messages.Any(message =>
+            message != null &&
+            string.Equals(message.role, "user", StringComparison.OrdinalIgnoreCase) &&
+            !string.IsNullOrWhiteSpace(message.text));
     }
 
     private static DateTime GetSessionSortKey(ChatSessionData session)
@@ -2014,7 +2175,7 @@ public class ChatUIController : MonoBehaviour
         layoutElement.flexibleHeight = 0f;
     }
 
-    private void ScrollMessagesToBottom()
+    private void ScrollMessagesToLatest()
     {
         if (messagesScrollRect == null)
         {
@@ -2022,7 +2183,172 @@ public class ChatUIController : MonoBehaviour
         }
 
         Canvas.ForceUpdateCanvases();
-        messagesScrollRect.normalizedPosition = new Vector2(0f, 0f);
+        messagesScrollRect.StopMovement();
+
+        if (messagesContent != null)
+        {
+            Vector2 anchoredPosition = messagesContent.anchoredPosition;
+            anchoredPosition.y = 0f;
+            messagesContent.anchoredPosition = anchoredPosition;
+        }
+
+        bool hasRealMessages = currentSession != null &&
+            currentSession.messages != null &&
+            currentSession.messages.Any(message => message != null && !string.IsNullOrWhiteSpace(message.text));
+        float targetVerticalPosition = hasRealMessages && lastMessagesContentOverflows ? 0f : 1f;
+        messagesScrollRect.verticalNormalizedPosition = targetVerticalPosition;
+        messagesScrollRect.normalizedPosition = new Vector2(0f, targetVerticalPosition);
+    }
+
+    private void EnsureGreetingPlaceholder()
+    {
+        if (messagesScrollRect == null || botMessageTemplate == null)
+        {
+            return;
+        }
+
+        RectTransform viewport = messagesScrollRect.viewport;
+        if (viewport == null)
+        {
+            return;
+        }
+
+        if (greetingPlaceholderRow == null)
+        {
+            greetingPlaceholderRow = new GameObject("GreetingPlaceholderRow", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+            RectTransform rowRect = greetingPlaceholderRow.transform as RectTransform;
+            rowRect.SetParent(viewport, false);
+            rowRect.localScale = Vector3.one;
+            rowRect.anchorMin = new Vector2(0f, 0f);
+            rowRect.anchorMax = new Vector2(1f, 0f);
+            rowRect.pivot = new Vector2(0.5f, 0f);
+            rowRect.anchoredPosition = new Vector2(0f, 12f);
+            rowRect.sizeDelta = new Vector2(0f, 140f);
+
+            HorizontalLayoutGroup rowGroup = greetingPlaceholderRow.GetComponent<HorizontalLayoutGroup>();
+            rowGroup.childAlignment = TextAnchor.MiddleLeft;
+            rowGroup.childControlWidth = false;
+            rowGroup.childControlHeight = false;
+            rowGroup.childForceExpandWidth = false;
+            rowGroup.childForceExpandHeight = false;
+            rowGroup.padding = new RectOffset(170, 40, 0, 0);
+            rowGroup.spacing = 0f;
+        }
+
+        if (greetingPlaceholderItem == null)
+        {
+            greetingPlaceholderItem = Instantiate(botMessageTemplate, greetingPlaceholderRow.transform);
+            greetingPlaceholderItem.name = "GreetingPlaceholderItem";
+            greetingPlaceholderItem.SetActive(true);
+
+            RectTransform itemRect = greetingPlaceholderItem.transform as RectTransform;
+            RectTransform templateRect = botMessageTemplate.transform as RectTransform;
+            float bubbleWidth = templateRect != null && templateRect.sizeDelta.x > 0f ? templateRect.sizeDelta.x : 816.9259f;
+            float bubbleHeight = templateRect != null && templateRect.sizeDelta.y > 0f ? templateRect.sizeDelta.y : 132.8784f;
+            PrepareMessageBubbleForLayout(itemRect, bubbleWidth, bubbleHeight);
+        }
+    }
+
+    private void UpdateGreetingPlaceholder(bool shouldShow)
+    {
+        EnsureGreetingPlaceholder();
+        if (greetingPlaceholderRow == null || greetingPlaceholderItem == null)
+        {
+            return;
+        }
+
+        greetingPlaceholderRow.SetActive(shouldShow);
+        if (!shouldShow)
+        {
+            return;
+        }
+
+        ChatMessageData placeholderMessage = new ChatMessageData
+        {
+            role = "assistant",
+            text = BuildWelcomeMessage(GetCurrentLanguage()),
+            timestampUtc = currentSession != null ? currentSession.createdAtUtc : DateTime.UtcNow.ToString("o")
+        };
+
+        TextMeshProUGUI timeText = FindTimeText(greetingPlaceholderItem);
+        TextMeshProUGUI messageText = FindMessageText(greetingPlaceholderItem, timeText);
+        if (messageText != null)
+        {
+            messageText.text = placeholderMessage.text;
+            ConfigureMessageText(messageText);
+            ApplyMessageTextStyle(messageText, true);
+        }
+
+        if (timeText != null)
+        {
+            timeText.text = FormatChatTime(placeholderMessage.timestampUtc);
+            ConfigureTimeText(timeText);
+            ApplyTimeTextStyle(timeText, true);
+        }
+
+        RectTransform templateRect = botMessageTemplate.transform as RectTransform;
+        float bubbleWidth = templateRect != null && templateRect.sizeDelta.x > 0f ? templateRect.sizeDelta.x : 816.9259f;
+        float bubbleHeight = templateRect != null && templateRect.sizeDelta.y > 0f ? templateRect.sizeDelta.y : 132.8784f;
+        AdjustStandaloneBubbleHeight(greetingPlaceholderRow, greetingPlaceholderItem, bubbleWidth, bubbleHeight);
+    }
+
+    private void AdjustStandaloneBubbleHeight(GameObject row, GameObject item, float bubbleWidth, float minimumHeight)
+    {
+        if (row == null || item == null)
+        {
+            return;
+        }
+
+        RectTransform itemRect = item.transform as RectTransform;
+        RectTransform rowRect = row.transform as RectTransform;
+        if (itemRect == null || rowRect == null)
+        {
+            return;
+        }
+
+        Canvas.ForceUpdateCanvases();
+        TextMeshProUGUI timeText = FindTimeText(item);
+        TextMeshProUGUI messageText = FindMessageText(item, timeText);
+        float preferredTextHeight = messageText != null ? messageText.GetPreferredValues(messageText.text, messageText.rectTransform.rect.width, 0f).y : 0f;
+        float preferredTimeHeight = timeText != null ? timeText.GetPreferredValues(timeText.text, timeText.rectTransform.rect.width, 0f).y : 0f;
+        float requiredHeight = Mathf.Max(minimumHeight, preferredTextHeight + preferredTimeHeight + 96f);
+
+        itemRect.sizeDelta = new Vector2(bubbleWidth, requiredHeight);
+        rowRect.sizeDelta = new Vector2(0f, requiredHeight);
+
+        LayoutElement bubbleLayout = item.GetComponent<LayoutElement>();
+        if (bubbleLayout != null)
+        {
+            bubbleLayout.preferredHeight = requiredHeight;
+            bubbleLayout.minHeight = requiredHeight;
+        }
+    }
+
+    private void ScheduleMessageScrollToLatest()
+    {
+        if (pendingScrollCoroutine != null)
+        {
+            StopCoroutine(pendingScrollCoroutine);
+        }
+
+        pendingScrollCoroutine = StartCoroutine(ScrollMessagesToLatestNextFrame());
+    }
+
+    private IEnumerator ScrollMessagesToLatestNextFrame()
+    {
+        yield return null;
+        yield return new WaitForEndOfFrame();
+        Canvas.ForceUpdateCanvases();
+        if (messagesContent != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(messagesContent);
+        }
+        ScrollMessagesToLatest();
+        yield return null;
+        yield return new WaitForEndOfFrame();
+        Canvas.ForceUpdateCanvases();
+        ScrollMessagesToLatest();
+        pendingScrollCoroutine = null;
     }
 
     private void NormalizeChatRootTransform()
@@ -2051,6 +2377,8 @@ public class ChatUIController : MonoBehaviour
         text.fontSizeMax = 34f;
         text.textWrappingMode = TextWrappingModes.Normal;
         text.overflowMode = TextOverflowModes.Overflow;
+        text.fontStyle = FontStyles.Normal;
+        text.alignment = TextAlignmentOptions.TopLeft;
     }
 
     private static void ConfigureTimeText(TextMeshProUGUI text)
@@ -2063,6 +2391,33 @@ public class ChatUIController : MonoBehaviour
         text.enableAutoSizing = true;
         text.fontSizeMin = 12f;
         text.fontSizeMax = 22f;
+        text.fontStyle = FontStyles.Normal;
+    }
+
+    private static void ApplyMessageTextStyle(TextMeshProUGUI text, bool isPlaceholderGreeting)
+    {
+        if (text == null || !isPlaceholderGreeting)
+        {
+            return;
+        }
+
+        text.fontStyle = FontStyles.Italic;
+        text.alignment = TextAlignmentOptions.MidlineLeft;
+        Color color = text.color;
+        color.a = Mathf.Clamp01(color.a * 0.78f);
+        text.color = color;
+    }
+
+    private static void ApplyTimeTextStyle(TextMeshProUGUI text, bool isPlaceholderGreeting)
+    {
+        if (text == null || !isPlaceholderGreeting)
+        {
+            return;
+        }
+
+        Color color = text.color;
+        color.a = Mathf.Clamp01(color.a * 0.65f);
+        text.color = color;
     }
 
     private static string FormatChatTime(string timestampUtc)
