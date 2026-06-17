@@ -24,6 +24,7 @@ public class QuizFlowController : MonoBehaviour
 
     private TextMeshProUGUI questionText;
     private TextMeshProUGUI scoreValueText;
+    private TextMeshProUGUI questionScoreLabelText;
     private TextMeshProUGUI questionProgressText;
     private readonly Button[] answerButtons = new Button[4];
     private readonly TextMeshProUGUI[] answerTexts = new TextMeshProUGUI[4];
@@ -266,6 +267,11 @@ public class QuizFlowController : MonoBehaviour
             scoreValueText.text = currentSession.score.ToString();
         }
 
+        if (questionScoreLabelText != null)
+        {
+            questionScoreLabelText.text = $"Score : {currentSession.score}";
+        }
+
         if (questionProgressText != null)
         {
             questionProgressText.text = $"{currentSession.currentQuestionIndex + 1} / {currentSession.questions.Count}";
@@ -321,6 +327,11 @@ public class QuizFlowController : MonoBehaviour
         if (scoreValueText != null)
         {
             scoreValueText.text = currentSession.score.ToString();
+        }
+
+        if (questionScoreLabelText != null)
+        {
+            questionScoreLabelText.text = $"Score : {currentSession.score}";
         }
 
         HighlightSubmittedAnswer(answerIndex, questionData.correctAnswer);
@@ -629,7 +640,10 @@ public class QuizFlowController : MonoBehaviour
 
         questionText = FindText(quizQuestionPage, "Question") ?? FindText(quizQuestionPage, "QuestionText");
         scoreValueText = FindText(quizQuestionPage, "ScoreValueText");
-        questionProgressText = FindText(quizQuestionPage, "CorrectText") ?? FindTextContaining(quizQuestionPage, "/");
+        questionScoreLabelText = FindText(quizQuestionPage, "ScoreText");
+        questionProgressText = FindText(quizQuestionPage, "ProgressText")
+            ?? FindText(quizQuestionPage, "CorrectText")
+            ?? FindTextContaining(quizQuestionPage, "/");
         answerButtons[0] = FindButton(quizQuestionPage, "AnswerAButton");
         answerButtons[1] = FindButton(quizQuestionPage, "AnswerBButton");
         answerButtons[2] = FindButton(quizQuestionPage, "AnswerCButton");
@@ -640,6 +654,11 @@ public class QuizFlowController : MonoBehaviour
         answerTexts[3] = FindText(quizQuestionPage, "AnswerDText");
         questionBackButton = FindButton(quizQuestionPage, "BackButton");
         questionTimer = quizQuestionPage != null ? quizQuestionPage.GetComponentInChildren<CircularQuizTimer>(true) : null;
+
+        for (int i = 0; i < answerTexts.Length; i++)
+        {
+            ConfigureAnswerText(answerTexts[i]);
+        }
 
         resultScoreValueText = FindText(quizResultPage, "ScoreValueText");
         resultTitleText = FindText(quizResultPage, "TitleText");
@@ -821,6 +840,14 @@ public class QuizFlowController : MonoBehaviour
         layoutElement.preferredHeight = preferredHeight;
         layoutElement.minHeight = preferredHeight;
         layoutElement.flexibleHeight = 0f;
+
+        ContentSizeFitter fitter = card.GetComponent<ContentSizeFitter>();
+        if (fitter != null)
+        {
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.enabled = false;
+        }
     }
 
     private void BindBreakdownCard(GameObject card, QuizQuestionData questionData, string selectedAnswer, int questionIndex)
@@ -842,6 +869,7 @@ public class QuizFlowController : MonoBehaviour
 
         if (questionLabel != null)
         {
+            ConfigureBreakdownText(questionLabel, true, 24f, 40f);
             questionLabel.text = BuildBreakdownQuestionText(questionIndex + 1, questionData.question, currentSession.completedAtUtc);
         }
 
@@ -852,6 +880,7 @@ public class QuizFlowController : MonoBehaviour
 
         if (yourAnswerValueLabel != null)
         {
+            ConfigureBreakdownText(yourAnswerValueLabel, false, 20f, 30f);
             yourAnswerValueLabel.text = string.IsNullOrWhiteSpace(selectedAnswer) ? "No answer" : selectedAnswer;
         }
 
@@ -862,6 +891,7 @@ public class QuizFlowController : MonoBehaviour
 
         if (correctAnswerValueLabel != null)
         {
+            ConfigureBreakdownText(correctAnswerValueLabel, false, 20f, 30f);
             correctAnswerValueLabel.text = questionData.correctAnswer;
         }
 
@@ -872,6 +902,7 @@ public class QuizFlowController : MonoBehaviour
 
         if (explanationValueLabel != null)
         {
+            ConfigureBreakdownText(explanationValueLabel, false, 18f, 28f);
             explanationValueLabel.text = questionData.explanation;
         }
 
@@ -901,6 +932,8 @@ public class QuizFlowController : MonoBehaviour
 
             if (choiceText != null)
             {
+                ConfigureBreakdownText(choiceText, false, 18f, 28f);
+                choiceText.alignment = TextAlignmentOptions.Center;
                 choiceText.text = string.IsNullOrWhiteSpace(choice) ? string.Empty : $"{(char)('A' + i)}. {choice}";
             }
 
@@ -909,6 +942,8 @@ public class QuizFlowController : MonoBehaviour
                 choiceImage.color = ResolveBreakdownChoiceColor(choice, selectedAnswer, questionData.correctAnswer);
             }
         }
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(card.transform as RectTransform);
     }
 
     private void ClearGeneratedBreakdownCards()
@@ -1010,6 +1045,21 @@ public class QuizFlowController : MonoBehaviour
         }
 
         return "Taken on " + parsed.ToLocalTime().ToString("MMMM dd, yyyy h:mm tt");
+    }
+
+    private static void ConfigureBreakdownText(TextMeshProUGUI textComponent, bool emphasize, float minFontSize, float maxFontSize)
+    {
+        if (textComponent == null)
+        {
+            return;
+        }
+
+        textComponent.enableAutoSizing = true;
+        textComponent.fontSizeMin = minFontSize;
+        textComponent.fontSizeMax = maxFontSize;
+        textComponent.textWrappingMode = TextWrappingModes.Normal;
+        textComponent.overflowMode = TextOverflowModes.Ellipsis;
+        textComponent.alignment = emphasize ? TextAlignmentOptions.TopLeft : TextAlignmentOptions.TopLeft;
     }
 
     private static List<string> CloneStringList(List<string> values)
@@ -1533,6 +1583,31 @@ public class QuizFlowController : MonoBehaviour
         }
 
         return null;
+    }
+
+    private static void ConfigureAnswerText(TextMeshProUGUI textComponent)
+    {
+        if (textComponent == null)
+        {
+            return;
+        }
+
+        textComponent.enableAutoSizing = true;
+        textComponent.fontSizeMax = Mathf.Max(textComponent.fontSizeMax, textComponent.fontSize);
+        textComponent.fontSizeMin = Mathf.Min(textComponent.fontSizeMin > 0f ? textComponent.fontSizeMin : 18f, 16f);
+        textComponent.textWrappingMode = TextWrappingModes.Normal;
+        textComponent.overflowMode = TextOverflowModes.Ellipsis;
+        textComponent.alignment = TextAlignmentOptions.Center;
+
+        RectTransform rectTransform = textComponent.rectTransform;
+        if (rectTransform != null && rectTransform.parent is RectTransform)
+        {
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.offsetMin = new Vector2(18f, 12f);
+            rectTransform.offsetMax = new Vector2(-18f, -12f);
+        }
     }
 
     private static T FindComponentInChildrenByName<T>(GameObject root, string objectName) where T : Component

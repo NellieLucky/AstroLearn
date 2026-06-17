@@ -69,10 +69,12 @@ public class AuthUIManager : MonoBehaviour
     private readonly List<Button> quizHistoryButtons = new List<Button>();
 
     private Button quizButton;
+    private Button askAiButton;
     private readonly List<Button> quizBackButtons = new List<Button>();
     private Button quizIntroBackButton;
     private Button quizIntroStartButton;
     private Button quizHistoryBackButton;
+    private Button aiExitButton;
 
     private TMP_InputField logInEmailInputField;
     private TMP_InputField logInPasswordInputField;
@@ -278,7 +280,15 @@ public class AuthUIManager : MonoBehaviour
         quizUiContainerRoot = quizUiRoot != null && quizUiRoot.transform.parent != null
             ? quizUiRoot.transform.parent.gameObject
             : null;
-        aiUiRoot = FindObjectByName("AIUI");
+        aiUiRoot = FindObjectByName("AIUI") ?? FindObjectByName("ChatbotCanvas") ?? FindObjectByName("Chatbot Canvas");
+        if (aiUiRoot == null)
+        {
+            GameObject chatPage = FindObjectByName("ChatPage");
+            if (chatPage != null)
+            {
+                aiUiRoot = GetTopLevelSceneParent(chatPage);
+            }
+        }
         arUiRoot = FindObjectByName("ARUI");
         planetInfoCard = FindObjectByName("PlanetInfoCard");
         imagesGalleryOverlay = FindObjectByName("ImagesGalleryOverlay");
@@ -425,6 +435,9 @@ public class AuthUIManager : MonoBehaviour
         quizButton = topRightGroup != null
             ? FindButton(topRightGroup, "QuizTopicButton") ?? FindButton(topRightGroup, "QuizButton")
             : null;
+        askAiButton = topRightGroup != null
+            ? FindButton(topRightGroup, "AskAIButton")
+            : null;
         if (quizButton == null)
         {
             List<Button> quizButtons = FindButtonsByNameGlobal("QuizTopicButton");
@@ -433,6 +446,11 @@ public class AuthUIManager : MonoBehaviour
                 quizButtons = FindButtonsByNameGlobal("QuizButton");
             }
             quizButton = quizButtons.Count > 0 ? quizButtons[0] : null;
+        }
+        if (askAiButton == null)
+        {
+            List<Button> askAiButtons = FindButtonsByNameGlobal("AskAIButton");
+            askAiButton = askAiButtons.Count > 0 ? askAiButtons[0] : null;
         }
         quizBackButtons.Clear();
         Button quizTopicBackButton = FindButton(quizTopicPage, "BackButton");
@@ -455,6 +473,9 @@ public class AuthUIManager : MonoBehaviour
 
         if (quizButton == null) Debug.LogWarning("[AuthUIManager] Quiz trigger button was not found in TopRightGroup.");
         else Debug.Log($"[AuthUIManager] Quiz trigger bound to {GetHierarchyPath(quizButton.transform)}");
+        aiExitButton = FindButton(aiUiRoot, "ExitButton") ?? FindButtonByChildText(aiUiRoot, "EXIT");
+        if (askAiButton == null) Debug.LogWarning("[AuthUIManager] AskAI trigger button was not found in TopRightGroup.");
+        if (aiUiRoot == null) Debug.LogWarning("[AuthUIManager] AI chat page was not found in scene.");
 
         setDisplayNamePage = FindObjectByName("SetDisplayNamePage");
         if (setDisplayNamePage != null)
@@ -516,6 +537,7 @@ public class AuthUIManager : MonoBehaviour
         }
 
         AddListener(quizButton, ShowQuizUi);
+        AddListener(askAiButton, ShowAiUi);
         foreach (Button button in quizBackButtons)
         {
             AddListener(button, ShowSolarSystemUiOnly);
@@ -525,6 +547,7 @@ public class AuthUIManager : MonoBehaviour
             AddListener(button, ShowQuizHistoryPage);
         }
         AddListener(quizHistoryBackButton, ShowQuizUi);
+        AddListener(aiExitButton, ShowSolarSystemUiOnly);
     }
 
     private void UnregisterListeners()
@@ -577,6 +600,7 @@ public class AuthUIManager : MonoBehaviour
         }
 
         RemoveListener(quizButton, ShowQuizUi);
+        RemoveListener(askAiButton, ShowAiUi);
         foreach (Button button in quizBackButtons)
         {
             RemoveListener(button, ShowSolarSystemUiOnly);
@@ -586,6 +610,7 @@ public class AuthUIManager : MonoBehaviour
             RemoveListener(button, ShowQuizHistoryPage);
         }
         RemoveListener(quizHistoryBackButton, ShowQuizUi);
+        RemoveListener(aiExitButton, ShowSolarSystemUiOnly);
     }
 
     private void SetupOtpInputContainer(GameObject container)
@@ -1789,6 +1814,48 @@ public class AuthUIManager : MonoBehaviour
         SetPageActive(quizBreakdownPage, false);
     }
 
+    private void ShowAiUi()
+    {
+        SetPageActive(menuRoot, false);
+        if (launchUiRoot != null) launchUiRoot.SetActive(false);
+        if (solarSystemUiRoot != null) solarSystemUiRoot.SetActive(false);
+        if (celestialBodyUiRoot != null) celestialBodyUiRoot.SetActive(false);
+        if (planetInfoCard != null) planetInfoCard.SetActive(false);
+        if (imagesGalleryOverlay != null) imagesGalleryOverlay.SetActive(false);
+        if (imageViewerOverlay != null) imageViewerOverlay.SetActive(false);
+        if (quizUiRoot != null) quizUiRoot.SetActive(false);
+        if (quizUiContainerRoot != null && quizUiContainerRoot != quizUiRoot) quizUiContainerRoot.SetActive(false);
+        if (arUiRoot != null) arUiRoot.SetActive(false);
+
+        if (solarSystemRoot != null)
+        {
+            solarSystemRoot.SetActive(false);
+        }
+
+        if (aiUiRoot != null)
+        {
+            RectTransform aiRectTransform = aiUiRoot.transform as RectTransform;
+            if (aiRectTransform != null && aiRectTransform.localScale.sqrMagnitude < 0.01f)
+            {
+                aiRectTransform.localScale = Vector3.one;
+            }
+
+            aiUiRoot.SetActive(true);
+        }
+
+        GameObject chatPage = FindChildObject(aiUiRoot, "ChatPage") ?? FindObjectByName("ChatPage");
+        if (chatPage != null)
+        {
+            chatPage.SetActive(true);
+        }
+
+        GameObject chatControllerObject = FindObjectByName("ChatUIController");
+        if (chatControllerObject != null)
+        {
+            chatControllerObject.SendMessage("OpenChatUi", SendMessageOptions.DontRequireReceiver);
+        }
+    }
+
     private void ApplyHistoryAccessState()
     {
         bool allowHistory = true;
@@ -2087,6 +2154,22 @@ public class AuthUIManager : MonoBehaviour
         {
             pageObject.SetActive(isActive);
         }
+    }
+
+    private static GameObject GetTopLevelSceneParent(GameObject child)
+    {
+        if (child == null)
+        {
+            return null;
+        }
+
+        Transform current = child.transform;
+        while (current.parent != null && current.parent.gameObject.scene.IsValid())
+        {
+            current = current.parent;
+        }
+
+        return current.gameObject;
     }
 
     private static void AddListener(Button button, UnityEngine.Events.UnityAction action)

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
 [System.Serializable]
 public class QuizTopicData
@@ -23,6 +24,8 @@ public class QuizTopicGenerator : MonoBehaviour
     public TextMeshProUGUI selectedTopicLabel; // The text that currently says "SUN QUIZ"
     public Button easyModeButton;
     public Button hardModeButton;
+    public Color selectedOutlineColor = new Color(0.45f, 0.8f, 1f, 1f);
+    public Color unselectedOutlineColor = new Color(0.15f, 0.3f, 0.5f, 1f);
 
     private string currentSelectedTopic;
     private GameObject quizTopicPage;
@@ -36,6 +39,7 @@ public class QuizTopicGenerator : MonoBehaviour
     private Button introBackButton;
     private Button introStartQuizButton;
     private string currentDifficulty = "Easy";
+    private readonly Dictionary<string, Button> topicButtonsByName = new Dictionary<string, Button>();
 
     private void Start()
     {
@@ -71,6 +75,8 @@ public class QuizTopicGenerator : MonoBehaviour
             introStartQuizButton.onClick.RemoveAllListeners();
             introStartQuizButton.onClick.AddListener(HandleStartQuizPressed);
         }
+
+        UpdateDifficultyButtonVisuals();
     }
 
     private void GenerateTopicButtons()
@@ -80,6 +86,8 @@ public class QuizTopicGenerator : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+
+        topicButtonsByName.Clear();
 
         // Loop through the list of topics and generate a button for each
         foreach (QuizTopicData topic in quizTopics)
@@ -120,6 +128,7 @@ public class QuizTopicGenerator : MonoBehaviour
             {
                 // We capture the current topic name in a local variable to avoid closure issues
                 string topicName = topic.topicName;
+                topicButtonsByName[topicName] = buttonComponent;
                 buttonComponent.onClick.RemoveAllListeners();
                 buttonComponent.onClick.AddListener(() => SelectTopic(topicName));
             }
@@ -136,6 +145,8 @@ public class QuizTopicGenerator : MonoBehaviour
             ConfigureSelectedTopicLabel();
             selectedTopicLabel.text = topicName.ToUpper();
         }
+
+        UpdateTopicButtonVisuals();
         
         Debug.Log($"[QuizTopicGenerator] Selected topic changed to: {topicName}");
     }
@@ -152,6 +163,7 @@ public class QuizTopicGenerator : MonoBehaviour
         }
 
         currentDifficulty = string.IsNullOrWhiteSpace(difficulty) ? "Easy" : difficulty;
+        UpdateDifficultyButtonVisuals();
 
         if (introTextLabel != null)
         {
@@ -300,6 +312,40 @@ public class QuizTopicGenerator : MonoBehaviour
             : "easy";
 
         return $"Can you answer {promptTone} questions about {topicName}?";
+    }
+
+    private void UpdateTopicButtonVisuals()
+    {
+        foreach (KeyValuePair<string, Button> entry in topicButtonsByName)
+        {
+            bool isSelected = string.Equals(entry.Key, currentSelectedTopic, System.StringComparison.OrdinalIgnoreCase);
+            SetButtonOutlineState(entry.Value, isSelected);
+        }
+    }
+
+    private void UpdateDifficultyButtonVisuals()
+    {
+        SetButtonOutlineState(easyModeButton, string.Equals(currentDifficulty, "Easy", System.StringComparison.OrdinalIgnoreCase));
+        SetButtonOutlineState(hardModeButton, string.Equals(currentDifficulty, "Hard", System.StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void SetButtonOutlineState(Button button, bool isSelected)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        Outline outline = button.GetComponent<Outline>();
+        if (outline == null)
+        {
+            outline = button.gameObject.AddComponent<Outline>();
+            outline.effectDistance = new Vector2(3f, 3f);
+            outline.useGraphicAlpha = true;
+        }
+
+        outline.enabled = true;
+        outline.effectColor = isSelected ? selectedOutlineColor : unselectedOutlineColor;
     }
 
     private static TextMeshProUGUI FindText(GameObject root, string objectName)
