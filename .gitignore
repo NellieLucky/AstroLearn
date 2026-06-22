@@ -31,3 +31,4 @@ Recordings/
 Assets/AssetStoreTools*
 .plastic/
 .env
+Packages/*.tgz

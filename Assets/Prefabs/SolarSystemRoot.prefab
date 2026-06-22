@@ -1,0 +1,3701 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1816839908978781114
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4117873334494841342}
+  m_Layer: 0
+  m_Name: SolarSystemRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4117873334494841342
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1816839908978781114}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 931.606, y: 795.0613, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6219985550817276266}
+  - {fileID: 773422082695945027}
+  - {fileID: 7816781477652024763}
+  - {fileID: 7087339993647071896}
+  - {fileID: 4868179434154604269}
+  - {fileID: 6188976464179679970}
+  - {fileID: 3611059705080862294}
+  - {fileID: 962781717759279315}
+  - {fileID: 640271085557003377}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2108343228075801276
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3611059705080862294}
+  - component: {fileID: 7487243231467586903}
+  - component: {fileID: 2029129441408626508}
+  - component: {fileID: 4755084215686901491}
+  - component: {fileID: 5347432516549491535}
+  - component: {fileID: 1370798270692477798}
+  - component: {fileID: 5342661904327785722}
+  - component: {fileID: 2428356520977444168}
+  - component: {fileID: 2414464879124385829}
+  m_Layer: 0
+  m_Name: Saturn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3611059705080862294
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -916.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5934606519894608889}
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &7487243231467586903
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &2029129441408626508
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 5a1e5654c80565649955c4671cdc4d49, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &4755084215686901491
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5347432516549491535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 35
+--- !u!114 &1370798270692477798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 6
+--- !u!114 &5342661904327785722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Saturn
+  labelColor: {r: 1, g: 0.76470596, b: 0, a: 1}
+  profileImage: {fileID: 21300000, guid: 7f54f8136de64e945b9d8dcddbb27ecf, type: 3}
+  profileDescription: <b>Saturn, the sixth planet from the Sun</b>, is the second
+    largest in the Solar System and is best known for its magnificent ring system.
+    This gas giant, named after the Roman god of agriculture and wealth, has captivated
+    astronomers for centuries with its striking rings, numerous moons, and unique
+    atmosphere.\n\nSaturn's immense size, complex system, and visual beauty make
+    it one of the most iconic planets in our Solar System.
+  stats:
+  - label: Mass
+    value: <b>5.68 x 10<sup>26</sup>kg</b>
+  - label: Diameter
+    value: <b>120,536 km</b>
+  - label: Distance to Sun
+    value: <b>1,432 million km</b>
+  - label: Orbital Period
+    value: <b>29 years</b>
+  - label: Length of Day
+    value: <b>10.7 hours</b>
+  - label: Gravity
+    value: <b>9 m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: 146
+  - label: Temperature (mean)
+    value: "<b>-140 \xB0C</b>"
+  - label: Atmosphere
+    value: H2+He
+  orbitCharacteristicsDescription: <b>Saturn orbits the Sun</b> at an average distance
+    of about 1.4 billion kilometers (886 million miles), making it the sixth planet
+    from the Sun. It takes Saturn approximately 29.5 Earth years to complete one
+    orbit.\n\nSaturn rotates rapidly on its axis, with a day lasting only about 10.7
+    hours. This rapid rotation, combined with its low density, causes Saturn to have
+    an oblate shape, with noticeable flattening at the poles and a bulging equator.
+  structureDescription: <b>Saturn has a central rocky core</b>, similar to Jupiter's
+    but less massive, surrounded by a thick layer of metallic hydrogen formed under
+    immense pressure. This metallic layer generates a magnetic field, though weaker
+    than Jupiter's.\n\nAbove it lies a layer of molecular hydrogen, which transitions
+    smoothly into the gaseous outer atmosphere. Saturn's lower density compared to
+    Jupiter reflects its smaller size and weaker gravitational compression.\n\nThe
+    atmosphere is primarily hydrogen and helium, with trace amounts of methane and
+    ammonia, contributing to the planet's subtle yellowish hue.
+  atmosphereImage: {fileID: 21300000, guid: baec1d1dc89dad146b5ee41a768bb640, type: 3}
+  atmosphereDescription: <b>Saturn's atmosphere</b> is mostly hydrogen and helium,
+    with trace amounts of methane, ammonia, and water vapor. Its upper atmosphere
+    is divided into cloud bands and zones, creating subtle stripes similar to Jupiter's,
+    though less distinct./n/nSaturn experiences fierce storms and powerful winds,
+    with speeds reaching up to 1,800 kilometers per hour (1,100 miles per hour) near
+    the equator. One of its most fascinating atmospheric features is a long-lasting
+    hexagonal storm at its north pole, with a distinctive six-sided shape that scientists
+    are still studying.
+  soundTitle: Spooky Saturn
+  focusDistanceOverride: 2
+  minFocusDistanceOverride: 0.8
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &2428356520977444168
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: c6052a41d1c55c14ba28ec27eb84a5d2, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &2414464879124385829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108343228075801276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &2335496905558280797
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4868179434154604269}
+  - component: {fileID: 8752235376630301541}
+  - component: {fileID: 2046451520111291247}
+  - component: {fileID: 7676732035777211906}
+  - component: {fileID: 2536542183894633847}
+  - component: {fileID: 8622076768395876715}
+  - component: {fileID: 2428381352651065421}
+  - component: {fileID: 1599992061850942177}
+  - component: {fileID: 2388731640610340812}
+  m_Layer: 0
+  m_Name: Mars
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4868179434154604269
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -922.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8752235376630301541
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &2046451520111291247
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f76766ebd131df64e84ccecb1724d2fd, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &7676732035777211906
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2536542183894633847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 20
+--- !u!114 &8622076768395876715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 14
+--- !u!114 &2428381352651065421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Mars
+  labelColor: {r: 1, g: 0.3372549, b: 0, a: 1}
+  profileImage: {fileID: 21300000, guid: d84684845c6ddc949bd85910a6de6590, type: 3}
+  profileDescription: <b>Mars, the fourth planet from the Sun</b>, is known as the
+    <b>Red Planet</b> due to its striking reddish appearance. This terrestrial world
+    has fascinated humanity for centuries with its polar ice caps, towering volcanoes,
+    and intriguing landscapes.\n\nNamed after the Roman god of war, Mars is a prime
+    focus of planetary exploration, as scientists search for clues about its climate,
+    geological history, and potential for past life.
+  stats:
+  - label: Mass
+    value: <b>6.42 x 10<sup>23</sup>kg</b>
+  - label: Diameter
+    value: <b>6,792 km</b>
+  - label: Distance to Sun
+    value: <b>228 million km</b>
+  - label: Orbital Period
+    value: <b>687 days</b>
+  - label: Length of Day
+    value: <b>24.7 hours</b>
+  - label: Gravity
+    value: <b>3,70 m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: 2
+  - label: Temperature (mean)
+    value: "<b>-65 \xB0C</b>"
+  - label: Atmosphere
+    value: CO2
+  orbitCharacteristicsDescription: <b>Mars orbits the Sun</b> at an average distance
+    of about 228 million kilometers (142 million miles), making it the fourth planet
+    in the Solar System. It takes about 687 Earth days to complete one orbit around
+    the Sun, resulting in Martian years that are nearly twice as long as those on
+    Earth.\n\nMars rotates on its axis approximately every 24.6 hours, meaning that
+    a Martian day (or ""sol"") is very similar in length to a day on Earth. The planet's
+    highly elliptical orbit contributes to its notable seasonal changes and temperature
+    swings.
+  structureDescription: <b>Mars has a partially molten iron-sulfur core</b>, which
+    is smaller and cooler than Earth's, making it unable to generate a global magnetic
+    field.\n\nSurrounding the core is a silicate mantle that was likely geologically
+    active in the past, fueling massive volcanic features such as Olympus Mons, the
+    largest volcano in the Solar System.\n\nMars's crust, which averages about 50
+    kilometers (31 miles) thick, is composed mainly of basaltic rock and is heavily
+    marked by impact craters, valleys, and evidence of ancient river channels. This
+    crust is rigid and lacks plate tectonics, preserving surface features for billions
+    of years.
+  atmosphereImage: {fileID: 21300000, guid: 7ae96ea3af9e15e47b0930f6fa55d829, type: 3}
+  atmosphereDescription: "<b>Mars's thin atmosphere</b> is composed primarily of
+    carbon dioxide (95%), with small amounts of nitrogen and argon. Because of its
+    low density, the atmosphere does little to retain heat, leading to drastic temperature
+    variations. Surface temperatures can range from -125\xB0C (-195\xB0F) at the
+    poles in winter to a mild 20\xB0C (68\xB0F) near the equator during the day.\\n\\nMars
+    experiences seasonal dust storms, some of which can envelope the entire planet
+    and obscure its surface for weeks at a time."
+  soundTitle: Mars Wind
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &1599992061850942177
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a7141dc84fc6e5d4b9013cd74518a70d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &2388731640610340812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2335496905558280797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &4729497458068432664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7087339993647071896}
+  - component: {fileID: 6255662083026914976}
+  - component: {fileID: 9043551381072445242}
+  - component: {fileID: 3048399419542461177}
+  - component: {fileID: 256937888624068034}
+  - component: {fileID: 2768248826202509189}
+  - component: {fileID: 8843282056337917037}
+  - component: {fileID: 4637693929652016359}
+  - component: {fileID: 169875338611900530}
+  m_Layer: 0
+  m_Name: Earth
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7087339993647071896
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -924.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 0.55, y: 0.55, z: 0.55}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 49592538095189010}
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6255662083026914976
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &9043551381072445242
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 564c5f767cf452d4297366b6f139dcc2, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &3048399419542461177
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &256937888624068034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 25
+--- !u!114 &2768248826202509189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 18
+--- !u!114 &8843282056337917037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Earth
+  labelColor: {r: 0, g: 0.0627451, b: 1, a: 1}
+  profileImage: {fileID: 21300000, guid: b315536a305ecc747a1907efcb50cbe0, type: 3}
+  profileDescription: <b>Earth, the third planet from the Sun</b>, is the only known
+    world that supports life. Its surface is dominated by vast oceans, diverse ecosystems,
+    and a complex atmosphere that together create a hospitable environment.\n\nKnown
+    as the <b>Blue Planet</b> for its abundance of water, Earth is a unique and vibrant
+    world where geological and atmospheric processes sustain its biosphere.
+  stats:
+  - label: Mass
+    value: <b>5.97 x 10<sup>24</sup>kg</b>
+  - label: Diameter
+    value: <b>12,756 km</b>
+  - label: Distance to Sun
+    value: <b>150 million km</b>
+  - label: Orbital Period
+    value: <b>365.2 days</b>
+  - label: Length of Day
+    value: <b>24 hours</b>
+  - label: Gravity
+    value: <b>9.80 m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: 1
+  - label: Temperature (mean)
+    value: "<b>15 \xB0C</b>"
+  - label: Atmosphere
+    value: N2+O2
+  orbitCharacteristicsDescription: <b>Earth orbits the Sun</b> at an average distance
+    of approximately 149.6 million kilometers (93 million miles), within a region
+    known as the habitable zone, where temperatures allow liquid water to exist.
+    Earth completes one orbit in 365.25 days, with this extra quarter-day leading
+    to leap years every four years to maintain our calendar.\n\nThe planet's 24-hour
+    rotation on its axis creates the day-night cycle, and its 23.5-degree axial tilt
+    results in seasonal changes as sunlight varies across different latitudes over
+    the year.
+  structureDescription: "<b>Earth has a dynamic internal structure</b>, beginning
+    with a solid inner core composed of iron and nickel, with temperatures reaching
+    5,400\xB0C (9,800\xB0F).\\n\\nSurrounding the inner core is a liquid outer core,
+    also made of iron and nickel, whose movement generates Earth's magnetic field.\\n\\nAbove
+    the core lies the silicate mantle, which is divided into upper and lower regions
+    and drives plate tectonics through convection currents.\\n\\nEarth's outermost
+    layer, the crust, varies in thickness from 5 kilometers (3 miles) in the oceanic
+    regions to 70 kilometers (43 miles) in mountainous areas, supporting a diverse
+    range of geological and biological activity."
+  atmosphereImage: {fileID: 21300000, guid: 9e3aab7bd613e8d498f46943543b841d, type: 3}
+  atmosphereDescription: <b>Earth's atmosphere is a vital</b>, multi-layered system
+    that supports life, regulates temperature, and drives weather patterns.\n\nComposed
+    mainly of nitrogen (78%) and oxygen (21%), with traces of carbon dioxide, water
+    vapor, and other gasses, this protective layer shields the surface from harmful
+    ultraviolet radiation.\n\nDivided into layers-troposphere, stratosphere, mesosphere,
+    thermosphere, and exosphere-Earth's atmosphere is responsible for the greenhouse
+    effect, which keeps the planet warm enough to sustain liquid water and life.
+  soundTitle: Earth's Magnetic Drum
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &4637693929652016359
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: aff2315af45ec7e42a7ea9a7a8ab71e9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &169875338611900530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4729497458068432664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &4826433377529634292
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7816781477652024763}
+  - component: {fileID: 3161135102317585042}
+  - component: {fileID: 3900744174535084482}
+  - component: {fileID: 4434371778759447666}
+  - component: {fileID: 6137794409655425153}
+  - component: {fileID: 7991965516800174368}
+  - component: {fileID: 7892064346014794836}
+  - component: {fileID: 6314050503800648199}
+  - component: {fileID: 55746034479851153}
+  m_Layer: 0
+  m_Name: Venus
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7816781477652024763
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -926.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &3161135102317585042
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &3900744174535084482
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: b27a53282afede04893a383e3bf66802, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &4434371778759447666
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6137794409655425153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 15
+--- !u!114 &7991965516800174368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 22
+--- !u!114 &7892064346014794836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Venus
+  labelColor: {r: 1, g: 0.3372549, b: 0, a: 1}
+  profileImage: {fileID: 21300000, guid: ee6decdccb204f94abd8384a368460d5, type: 3}
+  profileDescription: <b>Venus is the second planet from the Sun</b> and often called
+    <b>Earth's sister planet</b> due to its similar size and composition. However,
+    despite these surface similarities, Venus is an incredibly hostile world with
+    crushing atmospheric pressure, scorching temperatures, and clouds of sulfuric
+    acid.\n\nThis enigmatic planet has intrigued humans for centuries and remains
+    a key focus of space exploration.
+  stats:
+  - label: Mass
+    value: <b>4.87 x 10<sup>24</sup> kg</b>
+  - label: Diameter
+    value: <b>12,104 km</b>
+  - label: Distance to Sun
+    value: <b>108 million km</b>
+  - label: Orbital Period
+    value: <b>224.7 days</b>
+  - label: Length of Day
+    value: <b>117 days</b>
+  - label: Gravity
+    value: <b>8.90 m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: 0
+  - label: Temperature (mean)
+    value: "<b>464 \xB0C</b>"
+  - label: Atmosphere
+    value: <b>CO2</b>
+  orbitCharacteristicsDescription: '<b>Venus orbits the Sun</b> at an average distance
+    of about 108 million kilometers (67 million miles), making it the second closest
+    planet to our star. Its orbit is almost perfectly circular, and it takes 225
+    Earth days to complete a full orbit around the Sun.\n\nInterestingly, Venus has
+    a unique rotation: it rotates in the opposite direction of most planets, meaning
+    the Sun would appear to rise in the west and set in the east.\n\nAdditionally,
+    Venus has an incredibly slow rotation period, taking 243 Earth days to complete
+    one full spin on its axis, making its day longer than its year.'
+  structureDescription: <b>Venus's internal structure</b> consists of a central iron-nickel
+    core, roughly 3,000 kilometers (1,865 miles) in radius, similar in proportion
+    to Earth's core.\n\nSurrounding the core is a silicate mantle that drives the
+    planet's extensive volcanic activity. However, unlike Earth, Venus lacks plate
+    tectonics, which means heat from the mantle builds up and escapes through widespread
+    volcanic resurfacing events.\n\nThe outer crust of Venus, composed primarily
+    of basaltic rock, is relatively thin-about 10-20 kilometers (6-12 miles) and
+    is marked by vast lava plains and towering volcanic mountains, such as Maxwell
+    Montes.
+  atmosphereImage: {fileID: 21300000, guid: 28736df7720385d4794795d54d473553, type: 3}
+  atmosphereDescription: "<b>Venus has a thick and toxic atmosphere</b> composed
+    mainly of carbon dioxide, with clouds of sulfuric acid that shroud its surface
+    from view. This dense atmosphere creates a powerful greenhouse effect, trapping
+    heat and raising surface temperatures to around 465\xB0C (869\xB0F)-hot enough
+    to melt lead.\\n\\nThe atmospheric pressure on Venus's surface is 92 times greater
+    than Earth's, equivalent to being nearly a kilometer underwater on Earth. High-speed
+    winds in the upper atmosphere circle the planet in just a few days, creating
+    a dynamic weather system above the harsh surface."
+  soundTitle: Venere 14 Recording
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0.35
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &6314050503800648199
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9fc397031096efa4f98c3ac32849ef2a, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 0.9490196, g: 0.37521043, b: 0.36470586, a: 1}
+      key1: {r: 0.9490196, g: 0.37521043, b: 0.36470586, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 15651
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &55746034479851153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826433377529634292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &5010442177694088964
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 773422082695945027}
+  - component: {fileID: 6076568718043493788}
+  - component: {fileID: 228867354965940288}
+  - component: {fileID: 7473584250435489656}
+  - component: {fileID: 370019925721396309}
+  - component: {fileID: 2528418958476867120}
+  - component: {fileID: 1606103015698582190}
+  - component: {fileID: 9050172500525028229}
+  - component: {fileID: 4607342831433227278}
+  m_Layer: 0
+  m_Name: Mercury
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &773422082695945027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -928.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6076568718043493788
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &228867354965940288
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 87e305e62a8a9484cabbe11960e6c04b, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &7473584250435489656
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &370019925721396309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 30
+--- !u!114 &2528418958476867120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 20
+--- !u!114 &1606103015698582190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Mercury
+  labelColor: {r: 0.53333336, g: 0.53333336, b: 0.53333336, a: 1}
+  profileImage: {fileID: 21300000, guid: bc0117e9f38b06943a24622f176707de, type: 3}
+  profileDescription: <b>Mercury, the smallest and innermost planet,</b> orbits the
+    Sun faster than any other planet, completing a full lap in just 88 days. Named
+    after the Roman messenger god, it moves at an average distance of 57.9 million
+    kilometers (36 million miles) from the Sun and endures the most intense solar
+    radiation in the Solar System. \n \nAs a terrestrial planet, Mercury has a rocky,
+    heavily cratered surface with extensive cliffs, or "rupes," from ancient tectonic
+    activity. Its orbit is highly elliptical, causing varying distances from the
+    Sun, and it rotates very slowly, leading to extremely long days and nights.
+  stats:
+  - label: Mass
+    value: <b>3.30 x 10<sup>23</sup> kg</b>
+  - label: Diameter
+    value: <b>4,879 km</b>
+  - label: Distance to Sun
+    value: <b>58 million km</b>
+  - label: Orbital Period
+    value: <b>88 days</b>
+  - label: Length of day
+    value: <b>176 days</b>
+  - label: Gravity
+    value: <b>3.70 m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: <b>0</b>
+  - label: Atmosphere
+    value: <b>H+He+O</b>
+  - label: Temperature (Day)
+    value: "<b>427 \xB0C</b>"
+  - label: Temperature (Night)
+    value: "<b>-173 \xB0C</b>"
+  orbitCharacteristicsDescription: <b>Mercury, the closest planet to the Sun</b>,
+    has the fastest orbit in the Solar System, completing a full revolution in just
+    88 Earth days at an average speed of 47 kilometers per second (29 miles per second).
+    Its highly elliptical orbit ranges from 46 million kilometers (28.6 million miles)
+    at its closest point to the Sun (perihelion) to 70 million kilometers (43.5 million
+    miles) at its farthest (aphelion), causing significant variations in its surface
+    temperatures.\n\nMercury's unique rotation is locked in a 3:2 resonance with
+    its orbit, meaning it rotates three times for every two orbits, resulting in
+    a single day (sunrise to sunrise) that lasts 176 Earth days-twice as long as
+    its year.
+  structureDescription: <b>Mercury has a large, iron-rich core</b> that accounts
+    for about 85% of its radius, making it one of the most core-dominated planets
+    in the Solar System. This core is thought to be partially molten, which contributes
+    to Mercury's weak magnetic field, a rarity among terrestrial planets.\n\nSurrounding
+    the core is a thin silicate mantle, which is less geologically active than Earth's.\n\nThe
+    outer crust, also composed of silicate material, has been shaped by billions
+    of years of impact events, leaving the planet covered in craters and surface
+    features like cliffs, or ""rupes,"" formed as the planet cooled and contracted.
+  atmosphereImage: {fileID: 21300000, guid: 36fce7af1b0c78a46b6c6bb1a736088e, type: 3}
+  atmosphereDescription: "<b>Mercury does not have a traditional atmosphere</b>.
+    Instead, it has an exosphere-a tenuous layer of particles, including hydrogen,
+    helium, oxygen, sodium, and potassium. This exosphere is constantly replenished
+    as particles are knocked from the surface by solar radiation and micrometeoroid
+    impacts.\\n\\nWith no substantial atmosphere to trap heat, Mercury's temperatures
+    fluctuate wildly, from scorching 430\xB0C (800\xB0F) during the day to freezing
+    -180\xB0C (-290\xB0F) at night."
+  soundTitle: Mercury Radio Sounds
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &9050172500525028229
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 1abef90c48ace494a869b7fd6ba8a8ae, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &4607342831433227278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5010442177694088964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0
+  endpointAlpha: 0
+  bodyAlpha: 0
+  endpointWidthMultiplier: 0
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &5545052130232566740
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 955230460590519405}
+  - component: {fileID: 3016847816611974742}
+  - component: {fileID: 8221357367198724293}
+  m_Layer: 0
+  m_Name: Sun Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &955230460590519405
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5545052130232566740}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6219985550817276266}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!108 &3016847816611974742
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5545052130232566740}
+  m_Enabled: 1
+  serializedVersion: 12
+  m_Type: 2
+  m_Color: {r: 1, g: 0.6875044, b: 0.3679244, a: 1}
+  m_Intensity: 4
+  m_Range: 22.2
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 2
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!114 &8221357367198724293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5545052130232566740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!1 &5566651088231207176
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 49592538095189010}
+  - component: {fileID: 6348241779214462489}
+  - component: {fileID: 535664423286652903}
+  - component: {fileID: 7437745749093837634}
+  - component: {fileID: 7460027051548468100}
+  - component: {fileID: 3509805956434790980}
+  - component: {fileID: 3619310103240826716}
+  - component: {fileID: 8189468056817756948}
+  - component: {fileID: 4190475998319799184}
+  m_Layer: 0
+  m_Name: Moon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &49592538095189010
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7087339993647071896}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &6348241779214462489
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &535664423286652903
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9cecacd27ac63d94480bc5d9d60359d1, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &7437745749093837634
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7460027051548468100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 50
+--- !u!114 &3509805956434790980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aae2b9e54baf9604f8282ab46622b36c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundPlanet
+  target: {fileID: 7087339993647071896}
+  orbitSpeed: 50
+--- !u!114 &3619310103240826716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Moon
+  labelColor: {r: 0.53333336, g: 0.53333336, b: 0.53333336, a: 1}
+  profileImage: {fileID: 21300000, guid: d568d86991c861e4485a1b40b1c51fca, type: 3}
+  profileDescription: <b>The Moon, Earth's only natural satellite</b>, is known for
+    its phases, craters, and influence on Earth's tides, serving as a crucial companion
+    since its formation. The Moon orbits Earth at an average distance of 384,400
+    kilometers (238,855 miles) and takes about 27.3 days to complete a sidereal orbit.\n\nDue
+    to the alignment of the Earth-Moon-Sun system, a full moon cycle, or synodic
+    month, lasts about 29.5 days. Tidally locked to Earth, the Moon always shows
+    the same side, while the "far side" remains hidden, giving it a consistent face
+    in the night sky.
+  stats:
+  - label: Mass
+    value: <b>7.30 x 10<sup>22</sup>kg</b>
+  - label: Diameter
+    value: <b>3,475 km</b>
+  - label: Distance to Planet
+    value: <b>384 thousand km</b>
+  - label: Orbital Period
+    value: <b>27.3 days</b>
+  orbitCharacteristicsDescription: "<b>The Moon follows an elliptical orbit around
+    Earth</b> at an average distance of approximately 384,400 km, a journey that
+    takes about 27.3 days to complete relative to the stars. This path is notably
+    tilted at an angle of 5.1\xB0 relative to Earth's orbit around the Sun, which
+    explains why eclipses are rare celestial events rather than monthly occurrences.
+    Because the Moon and Earth are gravitationally bound, they actually orbit a shared
+    center of mass called the barycenter, a point located about 1,700 km beneath
+    Earth\u2019s surface."
+  structureDescription: "<b>The Moon's structure</b> is a differentiated body, meaning
+    it has a compositionally distinct crust, mantle, and core. Seismic studies reveal
+    that this layering formed during the Moon\u2019s initial formation in a massive
+    magma ocean event.\\n\\nThe outermost layer, or crust, is highly irregular in
+    thickness, averaging about 65 km (40 miles) thick on the side facing Earth, but
+    much thinner on the lunar farside. It is composed primarily of anorthosite rock,
+    rich in oxygen, silicon, and aluminum.\\n\\nBeneath the crust lies the rigid
+    and solid mantle, which is about 620 miles (1,000 km) thick. Unlike Earth's,
+    the lunar mantle is composed of rocks richer in iron and magnesium (olivine and
+    pyroxene) and is not as hot or fluid.\\n\\nAt the very center is a small, dense,
+    partially-molten metallic core with a radius of only about 150 miles (240 km).
+    It is thought to be made primarily of iron and nickel, and is the reason the
+    Moon has such a weak internal magnetic field. The core's relative size (only
+    1% to 2% of the Moon's total mass) is much smaller than Earth's or any of the
+    other terrestrial planets.\\n\\nThe Moon is entirely geologically inactive, with
+    no plate tectonics or current volcanic activity."
+  atmosphereImage: {fileID: 21300000, guid: 45711dc0545115c4c92c8de03730665a, type: 3}
+  atmosphereDescription: "<b>The moon's atmosphere </b> is mostly an exosphere, which
+    itself is mostly empty space. If you were to visit the Moon and walk around on
+    its surface, you might think it had no atmosphere at all. Molecules around the
+    Moon are so few and far between that they travel long distances without running
+    into anything, even each other. Earth\u2019s atmosphere, on the other hand, is
+    dense and collisional: air molecules are bumping into each other (and interfering
+    with each other\u2019s movements) all the time.\\n\\nSince the Moon\u2019s atmosphere
+    is not collisional, we can study each chemical component independently. For example,
+    some scientists work to understand how water forms and changes on the Moon by
+    investigating the behavior of hydrogen atoms in the exosphere. Chemical components
+    of the lunar exosphere have their own \u2018cycles\u2019 of movement between
+    the ground and the space nearby, and distinct migration patterns from place to
+    place on the Moon\u2019s surface.  "
+  soundTitle: 
+  focusDistanceOverride: 0.19
+  minFocusDistanceOverride: 0.05
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &8189468056817756948
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 7a070d67104c3c248a0c5d69e77919ca, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &4190475998319799184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566651088231207176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &5591025119832306935
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 962781717759279315}
+  - component: {fileID: 8959115982230207413}
+  - component: {fileID: 6381340249083649599}
+  - component: {fileID: 4966539681035828285}
+  - component: {fileID: 843162982272703084}
+  - component: {fileID: 9213908166507290426}
+  - component: {fileID: 7978915992947717779}
+  - component: {fileID: 4612535467921462948}
+  - component: {fileID: 7437066690937898715}
+  m_Layer: 0
+  m_Name: Uranus
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &962781717759279315
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -913.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8959115982230207413
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &6381340249083649599
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 7b35adec3d7abad49a051fc0960d0b20, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &4966539681035828285
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &843162982272703084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 18
+--- !u!114 &9213908166507290426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 4
+--- !u!114 &7978915992947717779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Uranus
+  labelColor: {r: 0, g: 0.7843138, b: 1, a: 1}
+  profileImage: {fileID: 21300000, guid: ef23a8ac8b151af4d9093293a1ff93e7, type: 3}
+  profileDescription: <b>Uranus, the seventh planet from the Sun</b>, is known for
+    its striking blue-green color and unique sideways tilt. As one of the two ice
+    giants in the Solar System, along with Neptune, Uranus has a composition and
+    atmosphere distinct from the gas giants, Jupiter and Saturn.\n\nDiscovered in
+    the late 18th century, Uranus remains a mysterious world due to its distance
+    from Earth.
+  stats:
+  - label: Mass
+    value: <b>8.68 x 10<sup>25</sup>kg</b>
+  - label: Diameter
+    value: <b>51,118 km</b>
+  - label: Distance to Sun
+    value: <b>2,867 million km</b>
+  - label: Orbital Period
+    value: <b>84 years</b>
+  - label: Length of Day
+    value: <b>17.2 hours</b>
+  - label: Gravity
+    value: <b>8.70m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: 28
+  - label: Temperature (mean)
+    value: "<b>-195 \xB0C</b>"
+  - label: Atmosphere
+    value: H2+He
+  orbitCharacteristicsDescription: <b>Uranus orbits the Sun</b> at an average distance
+    of approximately 2.9 billion kilometers (1.8 billion miles), making it the seventh
+    planet from the Sun. It takes about 84 Earth years to complete a single orbit,
+    meaning each Uranian season lasts over 20 Earth years.\n\nUranus's most unusual
+    feature is its extreme axial tilt of about 98 degrees, which causes the planet
+    to rotate on its side. This sideways tilt leads to extreme seasonal changes,
+    with each pole facing the Sun continuously for about 42 Earth years before switching.\n\nA
+    day on Uranus, defined as the time it takes to complete one rotation on its axis,
+    lasts about 17 hours and 14 minutes.
+  structureDescription: <b>Uranus's internal structure</b> begins with a small rocky
+    core, composed of silicates and metals, which is surrounded by a thick mantle
+    of water, ammonia, and methane ""ices."" This icy mantle accounts for the majority
+    of Uranus's mass and gives it its classification as an ice giant.\n\nThe outer
+    layer consists of molecular hydrogen and helium, with trace amounts of methane
+    that give Uranus its pale blue-green color.\n\nUnlike gas giants, Uranus lacks
+    a metallic hydrogen layer, and its tilted axis creates unique seasonal variations
+    in its outer atmospheric and internal processes.
+  atmosphereImage: {fileID: 21300000, guid: ea734cf4efe8d7144bbab155d73436d9, type: 3}
+  atmosphereDescription: "<b>The atmosphere of Uranus</b> is composed mainly of hydrogen
+    and helium, with traces of methane and other hydrocarbons. Methane, which gives
+    Uranus its distinctive color, absorbs red light and reflects blue and green wavelengths.
+    The atmosphere is layered, with an upper cloud layer made of methane ice, and
+    possibly deeper layers of water and ammonia clouds.\\n\\nAlthough Uranus has
+    relatively few visible features compared to other planets, seasonal changes have
+    been observed in its cloud formations. Temperatures in Uranus's upper atmosphere
+    drop as low as -224\xB0C (-371\xB0F), making it one of the coldest planets in
+    the Solar System."
+  soundTitle: Uranus Radio Sound
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &4612535467921462948
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 740658089813fd34d8f0f3b87f4ef7f0, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &7437066690937898715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591025119832306935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &5931871226678022954
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6188976464179679970}
+  - component: {fileID: 8454620862342208802}
+  - component: {fileID: 8242417443773548434}
+  - component: {fileID: 7015292038645524852}
+  - component: {fileID: 2488034743586284095}
+  - component: {fileID: 8339933223842426398}
+  - component: {fileID: 1276661992923815618}
+  - component: {fileID: 1367439924411840706}
+  - component: {fileID: 8048329244654217908}
+  m_Layer: 0
+  m_Name: Jupiter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6188976464179679970
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -919.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8454620862342208802
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &8242417443773548434
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 84363780cf17694448882cc352ff5d12, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &7015292038645524852
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2488034743586284095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 40
+--- !u!114 &8339933223842426398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 8
+--- !u!114 &1276661992923815618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Jupiter
+  labelColor: {r: 0.87843144, g: 0.60784316, b: 0.47058827, a: 1}
+  profileImage: {fileID: 21300000, guid: b115087bf96294f4a9c3d71b6f7ca8b7, type: 3}
+  profileDescription: <b>Jupiter is the fifth planet from the Sun</b> and the largest
+    in the Solar System, so massive that it could fit all the other planets inside
+    it with room to spare. Known for its striking cloud bands and the Great Red Spot,
+    Jupiter is a gas giant with a powerful magnetic field and a dynamic atmosphere.\n\nNamed
+    after the king of the Roman gods, Jupiter has fascinated scientists and astronomers
+    for centuries.
+  stats:
+  - label: Mass
+    value: <b>1.90 x 10<sup>27</sup>kg</b>
+  - label: Diameter
+    value: <b>142,984 km</b>
+  - label: Distance to Sun
+    value: <b>779 million km</b>
+  - label: Orbital Period
+    value: <b>11.9 years</b>
+  - label: Length of Day
+    value: <b>9.9 hours</b>
+  - label: Gravity
+    value: <b>23.10 m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: 95
+  - label: Temperature (mean)
+    value: "<b>-110 \xB0C</b>"
+  - label: Atmosphere
+    value: H2+He
+  orbitCharacteristicsDescription: <b>Jupiter is located</b> at an average distance
+    of about 778 million kilometers (484 million miles) from the Sun, making it the
+    fifth planet in the Solar System. It takes approximately 12 Earth years to complete
+    a full orbit around the Sun.\n\nJupiter rotates remarkably quickly on its axis,
+    completing one rotation in just under 10 hours, which causes the planet to bulge
+    slightly at the equator due to centrifugal forces. This rapid rotation is responsible
+    for its intense atmospheric bands and contributes to the formation of its powerful
+    storms.
+  structureDescription: <b>Jupiter's internal structure</b> is dominated by its immense
+    pressure and size, starting with a small, dense core made of rock and heavy elements,
+    estimated to be 10-20 times the mass of Earth.\n\nSurrounding the core is a thick
+    layer of metallic hydrogen, created under the extreme pressures within Jupiter,
+    where hydrogen behaves like a conductive metal. This metallic layer generates
+    Jupiter's powerful magnetic field.\n\nAbove this is an outer layer of molecular
+    hydrogen and helium, transitioning from a fluid state to the gaseous atmosphere
+    that features dynamic storms like the Great Red Spot.
+  atmosphereImage: {fileID: 21300000, guid: ebc2d44b50756314bab555e90c5cdf70, type: 3}
+  atmosphereDescription: <b>Jupiter's atmosphere</b> is composed mainly of hydrogen
+    and helium, with trace amounts of methane, ammonia, and water vapor. The planet's
+    atmosphere is divided into bands of clouds, creating dark belts and light zones
+    due to variations in temperature, composition, and circulation patterns.\n\nJupiter's
+    most famous feature, the Great Red Spot, is a colossal storm that has been raging
+    for at least 350 years. The storm is large enough to fit several Earths inside
+    it and showcases Jupiter's extreme weather patterns, which include intense winds
+    reaching up to 640 kilometers per hour (400 miles per hour).
+  soundTitle: Jupiter Lightning
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &1367439924411840706
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 7fa26aec8f811d548b10dd557d313f96, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &8048329244654217908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931871226678022954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &6107439926888393739
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 640271085557003377}
+  - component: {fileID: 3309298097933681812}
+  - component: {fileID: 3661437122359891006}
+  - component: {fileID: 3422385881866564236}
+  - component: {fileID: 457178012449267051}
+  - component: {fileID: 4503995469640867530}
+  - component: {fileID: 8228621214866155341}
+  - component: {fileID: 7107723560944499131}
+  - component: {fileID: 7382217143153183149}
+  m_Layer: 0
+  m_Name: Neptune
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &640271085557003377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -910.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &3309298097933681812
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &3661437122359891006
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 927fdb791e7e2ab4bb4f4ccb73ece9c6, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &3422385881866564236
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &457178012449267051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 16
+--- !u!114 &4503995469640867530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 575bac21aaf062349a393bc7f6b0d78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitAroundSun
+  sun: {fileID: 6219985550817276266}
+  orbitSpeed: 3
+--- !u!114 &8228621214866155341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Neptune
+  labelColor: {r: 0, g: 0.0627451, b: 1, a: 1}
+  profileImage: {fileID: 21300000, guid: 38cd1686daf57e340bac8d6398cabefe, type: 3}
+  profileDescription: <b>Neptune, the eighth and farthest planet from the Sun</b>,
+    is known for its pale blue color, intense weather systems, and supersonic winds.
+    As an ice giant similar to Uranus, Neptune is a cold, remote world with a unique
+    atmosphere and dynamic storms.\n\nNamed after the Roman god of the sea, Neptune
+    remains a mysterious and intriguing planet at the outer edge of our Solar System.
+  stats:
+  - label: Mass
+    value: <b>1.02 x 10<sup>26</sup>kg</b>
+  - label: Diameter
+    value: <b>49,528 km</b>
+  - label: Distance to Sun
+    value: <b>4,515 million km</b>
+  - label: Orbital Period
+    value: <b>164 years</b>
+  - label: Length of Day
+    value: <b>16.1 hours</b>
+  - label: Gravity
+    value: <b>11 m/s<sup>2</sup></b>
+  - label: Satellite count
+    value: 16
+  - label: Temperature (mean)
+    value: "<b>-200 \xB0C</b>"
+  - label: Atmosphere
+    value: H2+He
+  orbitCharacteristicsDescription: <b>Neptune orbits the Sun</b> at an average distance
+    of approximately 4.5 billion kilometers (2.8 billion miles), making it the most
+    distant of the eight planets. It takes Neptune around 165 Earth years to complete
+    one orbit, so a single year on Neptune is longer than the entire modern history
+    of humanity.\n\nNeptune's rotation period is about 16 hours, giving it a short
+    day compared to its long year.\n\nAlthough distant, Neptune's mass exerts a significant
+    gravitational influence on nearby objects, affecting the orbits of Kuiper Belt
+    objects and dwarf planets like Pluto.
+  structureDescription: <b>Neptune's structure is similar to Uranus's</b>, with a
+    small rocky core composed of silicates and metals, surrounded by a mantle of
+    water, ammonia, and methane ""ices."" This mantle is fluid under extreme pressures,
+    contributing to Neptune's mass and density.\n\nThe outer layer is made up of
+    molecular hydrogen and helium, with methane providing Neptune's signature pale
+    blue color.\n\nNeptune's internal heat is greater than Uranus's, driving more
+    dynamic atmospheric activity, including supersonic winds and transient storm
+    systems such as the Great Dark Spot.
+  atmosphereImage: {fileID: 21300000, guid: 33b1f90c0dc64bf4095f21498080a347, type: 3}
+  atmosphereDescription: "<b>Neptune's atmosphere</b> is composed mainly of hydrogen
+    and helium, with a small amount of methane that gives the planet its characteristic
+    blue color. It has the most intense weather systems in the Solar System, with
+    winds reaching up to 2,100 kilometers per hour (1,300 miles per hour).\\n\\nNeptune
+    is known for its Great Dark Spot, a massive storm similar to Jupiter's Great
+    Red Spot, though Neptune's storm systems appear and disappear over shorter timescales.
+    The upper atmosphere is extremely cold, with temperatures dropping to -214\xB0C
+    (-353\xB0F), yet Neptune radiates more energy than it receives from the Sun,
+    suggesting an internal heat source."
+  soundTitle: Neptune Radio Sound
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0
+  maxFocusDistanceOverride: 30
+  galleryEntries: []
+--- !u!120 &7107723560944499131
+LineRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: aff2315af45ec7e42a7ea9a7a8ab71e9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.015422821
+        value: 0.012207031
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 1, g: 1, b: 1, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 2
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &7382217143153183149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107439926888393739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00659dac6efe6f40ac3e69b88431436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitSnakeTrail
+  orbitCoverage: 0.82
+  sampleCount: 96
+  alignToOrbitPlane: 1
+  endpointFadePortion: 0.16
+  endpointAlpha: 0
+  bodyAlpha: 1
+  endpointWidthMultiplier: 0.1
+  autoWidth: 1
+  widthPerOrbitUnit: 0.0025
+  minLineWidth: 0.006
+  maxLineWidth: 0.03
+  forceTransparentMaterial: 1
+--- !u!1 &6392382166312832545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6219985550817276266}
+  - component: {fileID: 4231023208916656896}
+  - component: {fileID: 6052564609185345925}
+  - component: {fileID: 3517219447989102665}
+  - component: {fileID: 6454570829811410070}
+  - component: {fileID: 2152833601212742420}
+  m_Layer: 0
+  m_Name: Sun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6219985550817276266
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392382166312832545}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -931.606, y: -795.0613, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 955230460590519405}
+  m_Father: {fileID: 4117873334494841342}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4231023208916656896
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392382166312832545}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &6052564609185345925
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392382166312832545}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 82a38a5fa9d4df8499d7da6195605ce8, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &3517219447989102665
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392382166312832545}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6454570829811410070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392382166312832545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0091b13f32414af4d8590c10849e3325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanetRotation
+  rotationSpeed: 20
+--- !u!114 &2152833601212742420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392382166312832545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31629047cadc70941a4f1725fe6382fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialBody
+  bodyName: Sun
+  labelColor: {r: 1, g: 0.98823535, b: 0.36078432, a: 1}
+  profileImage: {fileID: 21300000, guid: 13be78a5b5761794d9a064c0e78b884d, type: 3}
+  profileDescription: <b>The Sun is the heart of our Solar System</b>, a massive,
+    glowing sphere of hot gas and plasma that provides the light and warmth essential
+    for life on Earth. Classified as a G-type main-sequence star (often called a
+    yellow dwarf), the Sun is one of billions of stars in our galaxy, but it holds
+    a unique place in our sky and in sustaining the conditions for life as we know
+    it.
+  stats:
+  - label: Mass
+    value: <b>1.99 x 10<sup>30</sup> kg</b>
+  - label: Diameter
+    value: <b>1,392,000 km</b>
+  - label: Length of Day
+    value: <b>9.9 hours</b>
+  - label: Gravity
+    value: <b>23.10 m/s<sup>2</sup></b>
+  - label: Atmosphere
+    value: <b>H2+He</b>
+  - label: Temperature (Surface)
+    value: "<b>5,000\xB0C</b>"
+  orbitCharacteristicsDescription: 
+  structureDescription: <b>The Sun's internal structure</b> consists of several layers
+    essential to its energy production and Solar System influence. At the core, temperatures
+    of 15 million degrees Celsius (27 million degrees Fahrenheit) enable nuclear
+    fusion, converting hydrogen into helium and releasing immense energy. \n\nThe
+    radiative zone surrounds the core, where energy moves outward through radiation
+    over thousands of years.\n\nBeyond it lies the convective zone, where hot plasma
+    rises and cooler plasma sinks, transporting energy to the surface.\n\nThe photosphere,
+    the visible outer layer, emits the light and heat that reach Earth, while the
+    chromosphere and corona extend millions of kilometers into space, reaching over
+    a million degrees Celsius.
+  atmosphereImage: {fileID: 21300000, guid: ec57e13ba5da24d409280a178e27a408, type: 3}
+  atmosphereDescription: "<b>The Sun's atmosphere</b> is composed of three main layers:
+    the photosphere, chromosphere, and corona.\\n\\nThe photosphere, the Sun's visible
+    surface, emits the light we see and has a temperature of about 5,500\xB0C (9,932\xB0F).
+    Above it lies the chromosphere, a reddish layer visible during solar eclipses,
+    where temperatures rise to around 20,000\xB0C (36,000\xB0F). The outermost layer,
+    the corona, extends millions of kilometers into space and is incredibly hot,
+    reaching temperatures of over 1 million degrees Celsius.\\n\\nThe Sun's atmosphere
+    is dynamic, constantly releasing solar wind, a stream of charged particles that
+    influences the entire Solar Svstem."
+  soundTitle: Parker's Probe Radio Whistlers
+  focusDistanceOverride: 0
+  minFocusDistanceOverride: 0
+  maxFocusDistanceOverride: 30
+  galleryEntries:
+  - image: {fileID: 21300000, guid: 61cbb6c11adc36d4487660b62f21db6b, type: 3}
+    title: Sun Emits a Solstice CME
+    description: This image from June 20, 2013, at 11:15 p.m. EDT shows the bright
+      light of a solar flare on the left side of the sun and an eruption of solar
+      material shooting through the sun's atmosphere, called a prominence eruption.
+      Shortly thereafter, this same region of the sun sent a coronal mass ejection
+      out into space.
+  - image: {fileID: 21300000, guid: 310a25282b885a3479f11782bb07b6eb, type: 3}
+    title: Active Star
+    description: Flaring, active regions of our sun are highlighted in this image
+      combining observations from several telescopes. High-energy X-rays from NASA's
+      Nuclear Spectroscopic Telescope Array (NuSTAR) are shown in blue; low-energy
+      X-rays from Japan's Hinode spacecraft are green; and extreme ultraviolet light
+      from NASA's Solar Dynamics Observatory (SDO) is yellow and red.
+  - image: {fileID: 21300000, guid: 5e1e973c7a421c74996a4f0031a1a14f, type: 3}
+    title: Sun Emits an X2.2 Flare
+    description: The sun emitted a significant solar flare, peaking at 12:22 p.m.
+      EDT on March 11, 2015. NASA's Solar Dynamics Observatory, which watches the
+      sun constantly, captured an image of the event. Solar flares are powerful bursts
+      of radiation. Harmful radiation from a flare cannot pass through Earth's atmosphere
+      to physically affect humans on the ground, however -- when intense enough --
+      they can disturb the atmosphere in the layer where GPS and communications signals
+      travel.
+  - image: {fileID: 21300000, guid: a85ff32c03ea6fb488d3909961cf155a, type: 3}
+    title: Gigantic Rolling Wave Captured on the Sun
+    description: A coronal mass ejection (CME) erupted from just around the edge
+      of the sun on May 1, 2013, in a gigantic rolling wave. CMEs can shoot over
+      a billion tons of particles into space at over a million miles per hour. This
+      CME occurred on the sun's limb and is not headed toward Earth.
+  - image: {fileID: 21300000, guid: 4d5679400a620af4e8bd1f9bd59bf50f, type: 3}
+    title: NASA's SDO Sees Giant Filament on the Sun
+    description: A dark line snaked across the lower half of the sun on Feb. 10,
+      2015, as seen in this image from NASA's Solar Dynamics Observatory, or SDO.
+      SDO shows colder material as dark and hotter material as light, so the line
+      is, in fact, an enormous swatch of colder material hovering in the sun's atmosphere,
+      the corona. Stretched out, that line or solar filament as scientists call it
+      - would be more than 533,000 miles long. That is longer than 67 Earths lined
+      up in a row.
+  - image: {fileID: 21300000, guid: b34343f5651739c408d4b2a437206d31, type: 3}
+    title: Magnificent CME Erupts on the Sun
+    description: Extremely energetic objects permeate the universe. But close to
+      home, the sun produces its own dazzling lightshow, producing the largest explosions
+      in our solar system and driving powerful solar storms.. When solar activity
+      contorts and realigns the sun's magnetic fields, vast amounts of energy can
+      be driven into space. This phenomenon can create a sudden flash of light-a
+      solar flare.
+  - image: {fileID: 21300000, guid: 49bb691ba30eec34689898378d80ddae, type: 3}
+    title: SDO Spots Extra Energy in the Sun's Corona
+    description: These jets, known as spicules, were captured in an SDO image on
+      April 25, 2010. Combined with the energy from ripples in the magnetic field,
+      they may contain enough energy to power the solar wind that streams from the
+      sun toward Earth at 1.5 million miles per hour.
+  - image: {fileID: 21300000, guid: c05476437e726824499c8144056a19be, type: 3}
+    title: Sun Shines in High-Energy X-rays
+    description: X-rays stream off the sun in this first picture of the sun, overlaid
+      on a picture taken by NASA Solar Dynamics Observatory SDO, taken by NASA NUSTAR.
+      The field of view covers the west limb of the sun.
+  - image: {fileID: 21300000, guid: 43c00b8b2128edc449dd002d0d8cf1de, type: 3}
+    title: Sunspots and Magnetic Fields
+    description: 'The physical correlation of magnetic intensity and sunspots is
+      clearly revealed when we fade back and forth between a filtered (i.e., white
+      light) image of the Sun with a magnetic image (magnetogram) taken the same
+      time (Dec. 18, 2014). Two large sunspot groups with strong magnetic intensity
+      stand out in both the magnetic and white light images. In magnetogram images
+      the stronger black and white areas indicate more powerful polarity. The fading
+      between the two kinds of images helps to underscore the magnetic intensity
+      of sunspots. These two active regions have unleashed a number of flares. We''re
+      keeping a close eye on them or more activity. Credit: Solar Dynamics Observatory,
+      NASA.'
+  - image: {fileID: 21300000, guid: 0bc9d9b07a806ac45a21a48207878c0e, type: 3}
+    title: Waving Magnetic Loops
+    description: 'In profile, the magnetic field lines emerging from several active
+      regions were easily observed as they reached across from one magnetic pole
+      to another (Sept. 4-5, 2013). When viewed in extreme ultraviolet light, the
+      tracings of charged particles along the magnetic field lines are revealed.
+      The bright, active regions are areas of intense magnetic forces. This level
+      of detail for the entire Sun has never been available before the SDO mission
+      became operational. The video clip covers about 18 hours of activity. Credit:
+      Solar Dynamics Observatory/NASA.'
+  - image: {fileID: 21300000, guid: e91c993a583f28341b18dfe4d1a17e66, type: 3}
+    title: Sunspot Trio
+    description: Over the past two weeks we have been watching since the Active Region
+      1504 appeared on the eastern limb of the Sun and formed into a trio of large
+      sunspots. They released several M-class (medium) solar flares while moving
+      across the Earth facing side of the Sun. As they are moving towards the western
+      limb of the Sun, we are getting one good last look at these beautiful sunspots.
+      This was captured by NASA's Solar Dynamics Observatory.
+--- !u!1 &6439704660252863562
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5934606519894608889}
+  - component: {fileID: 8509385956856440069}
+  - component: {fileID: 7124509084926987810}
+  - component: {fileID: 4254896083637534488}
+  m_Layer: 0
+  m_Name: SaturnRings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5934606519894608889
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6439704660252863562}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.681789, y: -0, z: -0, w: 0.73154896}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2.2, y: 2.2, z: 2.2}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3611059705080862294}
+  m_LocalEulerAnglesHint: {x: -85.967, y: 0, z: 0}
+--- !u!33 &8509385956856440069
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6439704660252863562}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &7124509084926987810
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6439704660252863562}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: be1bfd90ad5614c44836d4519a181f6c, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &4254896083637534488
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6439704660252863562}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
