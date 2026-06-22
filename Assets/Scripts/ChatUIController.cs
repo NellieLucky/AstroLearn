@@ -52,13 +52,19 @@ public class ChatUIController : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Bootstrap()
     {
-        if (FindFirstObjectByType<ChatUIController>() != null)
+        EnsureInstance();
+    }
+
+    public static ChatUIController EnsureInstance()
+    {
+        ChatUIController existing = FindFirstObjectByType<ChatUIController>();
+        if (existing != null)
         {
-            return;
+            return existing;
         }
 
         GameObject controllerObject = new GameObject("ChatUIController");
-        controllerObject.AddComponent<ChatUIController>();
+        return controllerObject.AddComponent<ChatUIController>();
     }
 
     private void Awake()
@@ -135,6 +141,9 @@ public class ChatUIController : MonoBehaviour
     {
         EnsureReferencesAreAlive();
         NormalizeChatRootTransform();
+        StopThinkingAnimation();
+        isWaitingForReply = false;
+        lastCloudRequestRateLimited = false;
         StartFreshSessionForOpen();
 
         if (chatbotRoot != null)
@@ -148,6 +157,7 @@ public class ChatUIController : MonoBehaviour
         }
 
         RenderAll();
+        UpdateActionStates();
 
         if (questionInputField != null)
         {

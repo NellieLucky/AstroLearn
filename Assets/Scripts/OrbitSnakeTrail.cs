@@ -200,4 +200,9 @@ public class OrbitSnakeTrail : MonoBehaviour
         runtimeLineMaterial.DisableKeyword("_ALPHATEST_ON");
         runtimeLineMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
     }
+
+    private void OnDestroy()
+    {
+        runtimeLineMaterial = null;
+    }
 }

@@ -6,6 +6,8 @@ using TMPro;
 
 public class AuthUIManager : MonoBehaviour
 {
+    public static bool ForceSolarSystemUiOnNextStart { get; set; }
+
     [SerializeField] private float splashPageDuration = 2f;
 
     [Header("Password Visibility Icons")]
@@ -142,6 +144,14 @@ public class AuthUIManager : MonoBehaviour
 
     private void Start()
     {
+        if (ForceSolarSystemUiOnNextStart)
+        {
+            ForceSolarSystemUiOnNextStart = false;
+            RefreshSceneBindings();
+            ApplyHistoryAccessState();
+            return;
+        }
+
         InitializeNavigationState();
         ApplyHistoryAccessState();
 
@@ -1682,6 +1692,11 @@ public class AuthUIManager : MonoBehaviour
         SetPageActive(menuRoot, true);
     }
 
+    public void OpenMenuFromButton()
+    {
+        ShowMenu();
+    }
+
     private void ShowSolarSystemUiOnly()
     {
         SetPageActive(menuRoot, false);
@@ -1742,6 +1757,84 @@ public class AuthUIManager : MonoBehaviour
         }
     }
 
+    public void ForceShowSolarSystemUiOnly()
+    {
+        RefreshSceneBindings();
+        OpenMainApplication();
+        SetPageActive(menuRoot, false);
+
+        if (launchUiRoot != null)
+        {
+            launchUiRoot.SetActive(false);
+        }
+
+        if (celestialBodyUiRoot != null)
+        {
+            celestialBodyUiRoot.SetActive(false);
+        }
+
+        if (planetInfoCard != null)
+        {
+            planetInfoCard.SetActive(false);
+        }
+
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(false);
+        }
+
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(false);
+        }
+
+        if (quizUiRoot != null)
+        {
+            quizUiRoot.SetActive(false);
+        }
+
+        if (quizUiContainerRoot != null && quizUiContainerRoot != quizUiRoot)
+        {
+            quizUiContainerRoot.SetActive(false);
+        }
+
+        if (aiUiRoot != null)
+        {
+            aiUiRoot.SetActive(false);
+        }
+
+        if (arUiRoot != null)
+        {
+            arUiRoot.SetActive(false);
+        }
+
+        if (solarSystemUiRoot != null)
+        {
+            solarSystemUiRoot.SetActive(true);
+        }
+
+        if (solarSystemRoot != null)
+        {
+            solarSystemRoot.SetActive(true);
+        }
+
+        GameObject loadingPanel = FindObjectByName("ARLoadingPanel");
+        if (loadingPanel != null)
+        {
+            loadingPanel.SetActive(false);
+        }
+
+        ApplyHistoryAccessState();
+    }
+
+    public void RefreshSceneBindings()
+    {
+        UnregisterListeners();
+        ResolveSceneReferences();
+        RegisterListeners();
+        SolarSystemSceneButtonAutoBinder.BindSceneButtons();
+    }
+
     private void ShowQuizUi()
     {
         Debug.Log($"[AuthUIManager] ShowQuizUi invoked. quizUiRoot={(quizUiRoot != null ? quizUiRoot.activeInHierarchy.ToString() : "null")}, quizTopicPage={(quizTopicPage != null ? quizTopicPage.activeSelf.ToString() : "null")}, quizUiContainerRoot={(quizUiContainerRoot != null ? quizUiContainerRoot.activeInHierarchy.ToString() : "null")}");
@@ -1772,6 +1865,19 @@ public class AuthUIManager : MonoBehaviour
             quizUiRoot.SetActive(true);
         }
 
+        if (QuizFlowController.Instance == null && FindFirstObjectByType<QuizFlowController>() == null)
+        {
+            GameObject controllerObject = new GameObject("QuizFlowController");
+            controllerObject.AddComponent<QuizFlowController>();
+        }
+
+        QuizTopicGenerator topicGenerator = FindFirstObjectByType<QuizTopicGenerator>();
+        if (topicGenerator != null)
+        {
+            topicGenerator.RefreshForOpen();
+            return;
+        }
+
         // Set QuizTopicPage active and deactivate all other pages under QuizUI
         SetPageActive(quizTopicPage, true);
         SetPageActive(quizHomePage, false);
@@ -1780,6 +1886,11 @@ public class AuthUIManager : MonoBehaviour
         SetPageActive(quizHistoryPage, false);
         SetPageActive(quizIntroPage, false);
         SetPageActive(quizBreakdownPage, false);
+    }
+
+    public void OpenQuizFromButton()
+    {
+        ShowQuizUi();
     }
 
     private void ShowQuizHistoryPage()
@@ -1849,11 +1960,12 @@ public class AuthUIManager : MonoBehaviour
             chatPage.SetActive(true);
         }
 
-        GameObject chatControllerObject = FindObjectByName("ChatUIController");
-        if (chatControllerObject != null)
-        {
-            chatControllerObject.SendMessage("OpenChatUi", SendMessageOptions.DontRequireReceiver);
-        }
+        ChatUIController.EnsureInstance().OpenChatUi();
+    }
+
+    public void OpenAiFromButton()
+    {
+        ShowAiUi();
     }
 
     private void ApplyHistoryAccessState()

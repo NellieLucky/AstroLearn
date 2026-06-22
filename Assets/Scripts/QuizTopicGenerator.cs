@@ -43,15 +43,35 @@ public class QuizTopicGenerator : MonoBehaviour
 
     private void Start()
     {
+        InitializeQuizUi();
+    }
+
+    public void RefreshForOpen()
+    {
+        InitializeQuizUi();
+        ShowTopicSelectionPage();
+    }
+
+    private void InitializeQuizUi()
+    {
         ResolveQuizPageReferences();
         ConfigureSelectedTopicLabel();
         ConfigureIntroTextLabel();
-        GenerateTopicButtons();
+        if (topicContainer != null && topicButtonPrefab != null)
+        {
+            GenerateTopicButtons();
+        }
 
         // Optional: Pre-select the first topic if the list isn't empty
         if (quizTopics.Count > 0)
         {
-            SelectTopic(quizTopics[0].topicName);
+            string topicToSelect = currentSelectedTopic;
+            if (string.IsNullOrWhiteSpace(topicToSelect) || !quizTopics.Exists(topic => string.Equals(topic.topicName, topicToSelect, System.StringComparison.OrdinalIgnoreCase)))
+            {
+                topicToSelect = quizTopics[0].topicName;
+            }
+
+            SelectTopic(topicToSelect);
         }
 
         // Hook up the difficulty buttons
@@ -74,6 +94,12 @@ public class QuizTopicGenerator : MonoBehaviour
         {
             introStartQuizButton.onClick.RemoveAllListeners();
             introStartQuizButton.onClick.AddListener(HandleStartQuizPressed);
+        }
+
+        string resolvedTopicName = GetResolvedSelectedTopic();
+        if (!string.IsNullOrWhiteSpace(resolvedTopicName))
+        {
+            RestoreIntroPrompt(resolvedTopicName);
         }
 
         UpdateDifficultyButtonVisuals();
