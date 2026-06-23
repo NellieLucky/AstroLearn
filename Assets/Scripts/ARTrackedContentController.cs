@@ -8,14 +8,17 @@ public class ARTrackedContentController : MonoBehaviour
     [SerializeField] private bool hideContentOnStart = true;
     [SerializeField] private string arCanvasObjectName = "ARCanvas";
     [SerializeField] private string instructionTextObjectName = "InstructionText";
+    [SerializeField] private string bodyNameOverride;
 
     private ARSceneUIController arSceneUiController;
     private GameObject instructionTextObject;
+    private string resolvedBodyName;
 
     private void Awake()
     {
         CacheArSceneUiController();
         CacheInstructionTextObject();
+        resolvedBodyName = ResolveBodyName();
 
         if (hideContentOnStart)
         {
@@ -25,9 +28,11 @@ public class ARTrackedContentController : MonoBehaviour
 
     public void HandleTargetFound()
     {
+        CacheArSceneUiController();
         SetTrackedVisible(true);
         if (arSceneUiController != null)
         {
+            arSceneUiController.HandleTrackedBodyFound(resolvedBodyName);
             arSceneUiController.HideInstructionText();
         }
         else if (instructionTextObject != null)
@@ -38,9 +43,11 @@ public class ARTrackedContentController : MonoBehaviour
 
     public void HandleTargetLost()
     {
+        CacheArSceneUiController();
         SetTrackedVisible(false);
         if (arSceneUiController != null)
         {
+            arSceneUiController.HandleTrackedBodyLost(resolvedBodyName);
             arSceneUiController.ShowInstructionText();
         }
         else if (instructionTextObject != null)
@@ -124,5 +131,31 @@ public class ARTrackedContentController : MonoBehaviour
         }
 
         return null;
+    }
+
+    private string ResolveBodyName()
+    {
+        if (!string.IsNullOrWhiteSpace(bodyNameOverride))
+        {
+            return ARBodySelectionContext.NormalizeBodyKey(bodyNameOverride);
+        }
+
+        if (string.Equals(gameObject.name, "ImageTarget_SolarSystem", System.StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gameObject.name, "ImageTarget", System.StringComparison.OrdinalIgnoreCase))
+        {
+            return string.Empty;
+        }
+
+        if (gameObject.name.StartsWith("ImageTarget_", System.StringComparison.OrdinalIgnoreCase))
+        {
+            return ARBodySelectionContext.NormalizeBodyKey(gameObject.name.Substring("ImageTarget_".Length));
+        }
+
+        if (trackedContentRoot != null && trackedContentRoot.name.StartsWith("TrackedContent_", System.StringComparison.OrdinalIgnoreCase))
+        {
+            return ARBodySelectionContext.NormalizeBodyKey(trackedContentRoot.name.Substring("TrackedContent_".Length));
+        }
+
+        return string.Empty;
     }
 }

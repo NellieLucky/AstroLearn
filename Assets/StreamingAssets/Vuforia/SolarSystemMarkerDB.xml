@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="moon_marker" size="10.000000 13.312102" />
+    <ImageTarget name="mars_marker" size="10.000000 13.354632" />
+    <ImageTarget name="neptune_marker" size="10.000000 13.354632" />
+    <ImageTarget name="uranus_marker" size="10.000000 13.312102" />
+    <ImageTarget name="saturn_marker" size="10.000000 13.312102" />
+    <ImageTarget name="jupiter_marker" size="10.000000 13.354632" />
+    <ImageTarget name="earth_marker" size="10.000000 13.312102" />
+    <ImageTarget name="venus_marker" size="10.000000 13.354632" />
+    <ImageTarget name="mercury_marker" size="10.000000 13.354632" />
+    <ImageTarget name="sun_marker" size="10.000000 13.312102" />
     <ImageTarget name="astrolearnmarker" size="10.000000 10.000000" />
   </Tracking>
 </QCARConfig>

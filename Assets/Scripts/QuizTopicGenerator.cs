@@ -35,10 +35,14 @@ public class QuizTopicGenerator : MonoBehaviour
     private GameObject quizResultPage;
     private GameObject quizHistoryPage;
     private GameObject quizBreakdownPage;
+    private Button quizHomeEasyModeButton;
+    private Button quizHomeHardModeButton;
+    private TextMeshProUGUI quizHomeTopicLabel;
     private TextMeshProUGUI introTextLabel;
     private Button introBackButton;
     private Button introStartQuizButton;
     private string currentDifficulty = "Easy";
+    private bool introBackReturnsToQuizHome;
     private readonly Dictionary<string, Button> topicButtonsByName = new Dictionary<string, Button>();
 
     private void Start()
@@ -48,8 +52,28 @@ public class QuizTopicGenerator : MonoBehaviour
 
     public void RefreshForOpen()
     {
+        introBackReturnsToQuizHome = false;
         InitializeQuizUi();
         ShowTopicSelectionPage();
+    }
+
+    public void OpenQuizHomeForTopic(string topicName)
+    {
+        introBackReturnsToQuizHome = true;
+        InitializeQuizUi();
+
+        string resolvedTopicName = ResolveAvailableTopicName(topicName);
+        if (string.IsNullOrWhiteSpace(resolvedTopicName) && quizTopics.Count > 0)
+        {
+            resolvedTopicName = quizTopics[0].topicName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(resolvedTopicName))
+        {
+            SelectTopic(resolvedTopicName);
+        }
+
+        SetQuizPageState(quizHomePage);
     }
 
     private void InitializeQuizUi()
@@ -75,20 +99,14 @@ public class QuizTopicGenerator : MonoBehaviour
         }
 
         // Hook up the difficulty buttons
-        if (easyModeButton != null)
-        {
-            easyModeButton.onClick.RemoveAllListeners();
-            easyModeButton.onClick.AddListener(() => StartQuiz(currentSelectedTopic, "Easy"));
-        }
-        if (hardModeButton != null)
-        {
-            hardModeButton.onClick.RemoveAllListeners();
-            hardModeButton.onClick.AddListener(() => StartQuiz(currentSelectedTopic, "Hard"));
-        }
+        BindDifficultyButton(easyModeButton, "Easy");
+        BindDifficultyButton(hardModeButton, "Hard");
+        BindDifficultyButton(quizHomeEasyModeButton, "Easy");
+        BindDifficultyButton(quizHomeHardModeButton, "Hard");
         if (introBackButton != null)
         {
             introBackButton.onClick.RemoveAllListeners();
-            introBackButton.onClick.AddListener(ShowTopicSelectionPage);
+            introBackButton.onClick.AddListener(HandleIntroBackPressed);
         }
         if (introStartQuizButton != null)
         {
@@ -164,17 +182,46 @@ public class QuizTopicGenerator : MonoBehaviour
     private void SelectTopic(string topicName)
     {
         currentSelectedTopic = topicName;
+
+        UpdateSelectedTopicLabels(topicName);
+
+        UpdateTopicButtonVisuals();
         
-        // Update the text on the bottom
+        Debug.Log($"[QuizTopicGenerator] Selected topic changed to: {topicName}");
+    }
+
+    private void UpdateSelectedTopicLabels(string topicName)
+    {
         if (selectedTopicLabel != null)
         {
             ConfigureSelectedTopicLabel();
             selectedTopicLabel.text = topicName.ToUpper();
         }
 
-        UpdateTopicButtonVisuals();
-        
-        Debug.Log($"[QuizTopicGenerator] Selected topic changed to: {topicName}");
+        if (quizHomeTopicLabel != null)
+        {
+            quizHomeTopicLabel.text = topicName;
+        }
+    }
+
+    private string ResolveAvailableTopicName(string topicName)
+    {
+        if (string.IsNullOrWhiteSpace(topicName))
+        {
+            return currentSelectedTopic;
+        }
+
+        string normalizedTopicName = topicName.Trim();
+        for (int i = 0; i < quizTopics.Count; i++)
+        {
+            QuizTopicData topic = quizTopics[i];
+            if (topic != null && string.Equals(topic.topicName, normalizedTopicName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return topic.topicName;
+            }
+        }
+
+        return normalizedTopicName;
     }
 
     private void StartQuiz(string topicName, string difficulty)
@@ -280,6 +327,12 @@ public class QuizTopicGenerator : MonoBehaviour
         quizResultPage = FindObjectByName("QuizResultPage");
         quizHistoryPage = FindObjectByName("QuizHistoryPage");
         quizBreakdownPage = FindObjectByName("QuizBreakdownPage");
+        selectedTopicLabel = FindText(quizTopicPage, "SelectedTopicText") ?? selectedTopicLabel;
+        easyModeButton = FindButton(quizTopicPage, "EasyButton") ?? easyModeButton;
+        hardModeButton = FindButton(quizTopicPage, "HardButton") ?? hardModeButton;
+        quizHomeEasyModeButton = FindButton(quizHomePage, "EasyButton") ?? quizHomeEasyModeButton;
+        quizHomeHardModeButton = FindButton(quizHomePage, "HardButton") ?? quizHomeHardModeButton;
+        quizHomeTopicLabel = FindText(quizHomePage, "TopicText") ?? FindText(quizHomePage, "TopicName");
         introTextLabel = FindText(quizIntroPage, "PromptText") ?? FindText(quizIntroPage, "IntroText");
         introBackButton = FindButton(quizIntroPage, "BackButton");
         introStartQuizButton = FindButton(quizIntroPage, "StartQuizButton") ?? FindButtonByChildText(quizIntroPage, "START QUIZ");
@@ -293,6 +346,11 @@ public class QuizTopicGenerator : MonoBehaviour
     private void ShowTopicSelectionPage()
     {
         SetQuizPageState(quizTopicPage);
+    }
+
+    private void ShowQuizHomePage()
+    {
+        SetQuizPageState(quizHomePage);
     }
 
     private void ShowQuestionPage()
@@ -323,12 +381,32 @@ public class QuizTopicGenerator : MonoBehaviour
             }
         }
 
+        if (quizHomeTopicLabel != null)
+        {
+            string labelTopic = quizHomeTopicLabel.text != null ? quizHomeTopicLabel.text.Trim() : string.Empty;
+            if (!string.IsNullOrWhiteSpace(labelTopic) && !string.Equals(labelTopic, "TOPIC", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return labelTopic;
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(currentSelectedTopic))
         {
             return currentSelectedTopic;
         }
 
         return fallbackTopicName;
+    }
+
+    private void HandleIntroBackPressed()
+    {
+        if (introBackReturnsToQuizHome)
+        {
+            ShowQuizHomePage();
+            return;
+        }
+
+        ShowTopicSelectionPage();
     }
 
     private static string BuildIntroPrompt(string topicName, string difficulty)
@@ -353,6 +431,19 @@ public class QuizTopicGenerator : MonoBehaviour
     {
         SetButtonOutlineState(easyModeButton, string.Equals(currentDifficulty, "Easy", System.StringComparison.OrdinalIgnoreCase));
         SetButtonOutlineState(hardModeButton, string.Equals(currentDifficulty, "Hard", System.StringComparison.OrdinalIgnoreCase));
+        SetButtonOutlineState(quizHomeEasyModeButton, string.Equals(currentDifficulty, "Easy", System.StringComparison.OrdinalIgnoreCase));
+        SetButtonOutlineState(quizHomeHardModeButton, string.Equals(currentDifficulty, "Hard", System.StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void BindDifficultyButton(Button button, string difficulty)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => StartQuiz(currentSelectedTopic, difficulty));
     }
 
     private void SetButtonOutlineState(Button button, bool isSelected)

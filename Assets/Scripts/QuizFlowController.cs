@@ -11,6 +11,9 @@ using UnityEngine.UI;
 public class QuizFlowController : MonoBehaviour
 {
     private const int DefaultQuestionCount = 10;
+    private const int LocalGeneratedQuestionCount = 4;
+    private const int OllamaQuizTimeoutSeconds = 40;
+    private const int OllamaQuizMaxTokens = 650;
 
     public static QuizFlowController Instance { get; private set; }
 
@@ -169,10 +172,23 @@ public class QuizFlowController : MonoBehaviour
         string endpoint = EnvFileLoader.Get("GEMINI_QUIZ_ENDPOINT");
         string bearerToken = EnvFileLoader.Get("GEMINI_QUIZ_BEARER_TOKEN");
         string anonKey = EnvFileLoader.Get("SUPABASE_ANON_KEY");
+        string ollamaEndpoint = EnvFileLoader.Get(
+            "OLLAMA_QUIZ_ENDPOINT",
+            EnvFileLoader.Get("OLLAMA_CHAT_ENDPOINT", "http://127.0.0.1:11434/api/generate"));
+        string ollamaModel = EnvFileLoader.Get(
+            "OLLAMA_QUIZ_MODEL",
+            EnvFileLoader.Get("OLLAMA_CHAT_MODEL", "llama3.2:3b"));
 
         if (!string.IsNullOrWhiteSpace(endpoint))
         {
             yield return StartCoroutine(RequestQuizFromEndpoint(endpoint.Trim(), bearerToken, anonKey, topic, difficulty, result => session = result));
+        }
+
+        bool canUseLocalQuizModel = !string.IsNullOrWhiteSpace(ollamaEndpoint) && !string.IsNullOrWhiteSpace(ollamaModel);
+        if (session == null && canUseLocalQuizModel)
+        {
+            Debug.Log("[QuizFlowController] Gemini unavailable. Trying local Ollama quiz generation.");
+            yield return StartCoroutine(RequestQuizFromOllama(ollamaEndpoint.Trim(), ollamaModel.Trim(), topic, difficulty, result => session = result));
         }
 
         if (session == null)
@@ -238,6 +254,84 @@ public class QuizFlowController : MonoBehaviour
                 onResult?.Invoke(null);
                 yield break;
             }
+
+            onResult?.Invoke(parsedSession);
+        }
+    }
+
+    private IEnumerator RequestQuizFromOllama(string endpoint, string model, string topic, string difficulty, Action<QuizSessionData> onResult)
+    {
+        string prompt = BuildLocalQuizPrompt(topic, difficulty);
+        Debug.Log("[QuizFlowController] Sending quiz request to Ollama model: " + model);
+        float requestStartedAt = Time.realtimeSinceStartup;
+
+        OllamaGenerateRequestPayload payload = new OllamaGenerateRequestPayload
+        {
+            model = model,
+            prompt = prompt,
+            stream = false,
+            keep_alive = "30m",
+            options = new OllamaOptionsPayload
+            {
+                num_predict = OllamaQuizMaxTokens,
+                temperature = 0.35f
+            }
+        };
+
+        byte[] requestBody = Encoding.UTF8.GetBytes(JsonUtility.ToJson(payload));
+
+        using (UnityWebRequest request = new UnityWebRequest(endpoint, UnityWebRequest.kHttpVerbPOST))
+        {
+            request.uploadHandler = new UploadHandlerRaw(requestBody);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.timeout = OllamaQuizTimeoutSeconds;
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                float elapsedSeconds = Time.realtimeSinceStartup - requestStartedAt;
+                Debug.LogWarning("[QuizFlowController] Ollama quiz request failed after " + elapsedSeconds.ToString("0.0") + "s: " + request.error);
+                onResult?.Invoke(null);
+                yield break;
+            }
+
+            string responseText = request.downloadHandler != null ? request.downloadHandler.text : null;
+            if (string.IsNullOrWhiteSpace(responseText))
+            {
+                Debug.LogWarning("[QuizFlowController] Ollama quiz response was empty.");
+                onResult?.Invoke(null);
+                yield break;
+            }
+
+            OllamaGenerateResponsePayload response = null;
+            try
+            {
+                response = JsonUtility.FromJson<OllamaGenerateResponsePayload>(responseText);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning("[QuizFlowController] Ollama quiz response parse failed: " + exception.Message);
+            }
+
+            if (response != null && !string.IsNullOrWhiteSpace(response.error))
+            {
+                Debug.LogWarning("[QuizFlowController] Ollama quiz response error: " + response.error);
+                onResult?.Invoke(null);
+                yield break;
+            }
+
+            string normalizedJson = NormalizeOllamaQuizJson(response != null ? response.response : null);
+            QuizSessionData parsedSession = ParseQuizSession(normalizedJson, topic, difficulty);
+            if (!ValidateSession(parsedSession, LocalGeneratedQuestionCount, DefaultQuestionCount))
+            {
+                Debug.LogWarning("[QuizFlowController] Ollama quiz response was invalid. Falling back to built-in quiz.");
+                onResult?.Invoke(null);
+                yield break;
+            }
+
+            Debug.Log("[QuizFlowController] Ollama quiz generated " + parsedSession.questions.Count + " question(s) in " + (Time.realtimeSinceStartup - requestStartedAt).ToString("0.0") + "s.");
 
             onResult?.Invoke(parsedSession);
         }
@@ -497,7 +591,7 @@ public class QuizFlowController : MonoBehaviour
             questionTimer.StopTimer();
         }
 
-        ShowTopicPage();
+        ShowSelectionPageForCurrentContext();
     }
 
     private void ShowQuestionPage()
@@ -522,6 +616,57 @@ public class QuizFlowController : MonoBehaviour
     {
         isReviewingHistoryAttempt = false;
         SetQuizPageState(quizTopicPage);
+    }
+
+    private void HandleResultBack()
+    {
+        isReviewingHistoryAttempt = false;
+
+        if (TryRestoreFocusedCelestialBodyView())
+        {
+            return;
+        }
+
+        ShowTopicPage();
+    }
+
+    private void HandleMoreQuizzes()
+    {
+        isReviewingHistoryAttempt = false;
+
+        if (ShowSelectionPageForCurrentContext())
+        {
+            return;
+        }
+
+        ShowTopicPage();
+    }
+
+    private bool ShowSelectionPageForCurrentContext()
+    {
+        AuthUIManager authUiManager = FindFirstObjectByType<AuthUIManager>();
+        if (authUiManager != null &&
+            authUiManager.IsFocusedCelestialBodyQuizFlowActive() &&
+            currentSession != null &&
+            !string.IsNullOrWhiteSpace(currentSession.topic))
+        {
+            authUiManager.OpenQuizHomeForTopic(currentSession.topic);
+            return true;
+        }
+
+        ShowTopicPage();
+        return true;
+    }
+
+    private bool TryRestoreFocusedCelestialBodyView()
+    {
+        AuthUIManager authUiManager = FindFirstObjectByType<AuthUIManager>();
+        if (authUiManager == null)
+        {
+            return false;
+        }
+
+        return authUiManager.TryRestoreFocusedCelestialBodyFromQuiz();
     }
 
     private void ShowHistoryPage()
@@ -580,13 +725,13 @@ public class QuizFlowController : MonoBehaviour
         if (resultBackButton != null)
         {
             resultBackButton.onClick.RemoveAllListeners();
-            resultBackButton.onClick.AddListener(ShowTopicPage);
+            resultBackButton.onClick.AddListener(HandleResultBack);
         }
 
         if (resultMoreQuizzesButton != null)
         {
             resultMoreQuizzesButton.onClick.RemoveAllListeners();
-            resultMoreQuizzesButton.onClick.AddListener(ShowTopicPage);
+            resultMoreQuizzesButton.onClick.AddListener(HandleMoreQuizzes);
         }
 
         if (resultRestartButton != null)
@@ -1188,9 +1333,47 @@ public class QuizFlowController : MonoBehaviour
         return parsedSession;
     }
 
-    private static bool ValidateSession(QuizSessionData session)
+    private static string NormalizeOllamaQuizJson(string rawResponse)
     {
-        if (session == null || session.questions == null || session.questions.Count != DefaultQuestionCount)
+        if (string.IsNullOrWhiteSpace(rawResponse))
+        {
+            return null;
+        }
+
+        string trimmed = rawResponse.Trim();
+        if (trimmed.StartsWith("```", StringComparison.Ordinal))
+        {
+            int firstNewline = trimmed.IndexOf('\n');
+            if (firstNewline >= 0)
+            {
+                trimmed = trimmed.Substring(firstNewline + 1).Trim();
+            }
+
+            if (trimmed.EndsWith("```", StringComparison.Ordinal))
+            {
+                trimmed = trimmed.Substring(0, trimmed.Length - 3).Trim();
+            }
+        }
+
+        int objectStart = trimmed.IndexOf('{');
+        int objectEnd = trimmed.LastIndexOf('}');
+        if (objectStart >= 0 && objectEnd > objectStart)
+        {
+            trimmed = trimmed.Substring(objectStart, objectEnd - objectStart + 1);
+        }
+
+        return trimmed;
+    }
+
+    private static bool ValidateSession(QuizSessionData session, int minimumQuestionCount = DefaultQuestionCount, int maximumQuestionCount = DefaultQuestionCount)
+    {
+        if (session == null || session.questions == null)
+        {
+            return false;
+        }
+
+        int questionCount = session.questions.Count;
+        if (questionCount < minimumQuestionCount || questionCount > maximumQuestionCount)
         {
             return false;
         }
@@ -1222,18 +1405,40 @@ public class QuizFlowController : MonoBehaviour
         string normalizedTopic = string.IsNullOrWhiteSpace(topic) ? "Solar System" : topic.Trim();
         string normalizedDifficulty = string.IsNullOrWhiteSpace(difficulty) ? "Easy" : difficulty.Trim();
 
-        List<QuizQuestionData> questionPool = BuildFallbackQuestionPool(normalizedTopic, normalizedDifficulty);
+        List<QuizQuestionData> fullQuestionPool = BuildFallbackQuestionPool(normalizedTopic, normalizedDifficulty);
+        List<QuizQuestionData> preferredQuestionPool = fullQuestionPool;
         if (excludedQuestionKeys != null && excludedQuestionKeys.Count > 0)
         {
-            questionPool = questionPool
+            preferredQuestionPool = fullQuestionPool
                 .Where(question => question != null && !excludedQuestionKeys.Contains(NormalizeQuestionKey(question.question)))
                 .ToList();
         }
 
-        Shuffle(questionPool);
-        List<QuizQuestionData> questions = questionPool.Take(DefaultQuestionCount)
+        Shuffle(preferredQuestionPool);
+        List<QuizQuestionData> questions = preferredQuestionPool
+            .Take(DefaultQuestionCount)
             .Select(CloneQuestion)
             .ToList();
+
+        if (questions.Count < DefaultQuestionCount)
+        {
+            HashSet<string> usedKeys = new HashSet<string>(
+                questions.Where(question => question != null).Select(question => NormalizeQuestionKey(question.question)),
+                StringComparer.Ordinal);
+
+            List<QuizQuestionData> topUpPool = fullQuestionPool
+                .Where(question => question != null && !usedKeys.Contains(NormalizeQuestionKey(question.question)))
+                .Select(CloneQuestion)
+                .ToList();
+
+            Shuffle(topUpPool);
+            while (questions.Count < DefaultQuestionCount && topUpPool.Count > 0)
+            {
+                QuizQuestionData nextQuestion = topUpPool[0];
+                topUpPool.RemoveAt(0);
+                questions.Add(nextQuestion);
+            }
+        }
 
         QuizSessionData session = new QuizSessionData
         {
@@ -1366,6 +1571,49 @@ public class QuizFlowController : MonoBehaviour
     {
         bool isEasy = string.Equals(difficulty, "Easy", StringComparison.OrdinalIgnoreCase);
         return isEasy ? BuildEasyFallbackQuestionPool(topic) : BuildHardFallbackQuestionPool(topic);
+    }
+
+    private static string BuildLocalQuizPrompt(string topic, string difficulty)
+    {
+        string resolvedTopic = ResolveTopicDisplayName(topic);
+        string resolvedDifficulty = string.Equals(difficulty, "Hard", StringComparison.OrdinalIgnoreCase) ? "Hard" : "Easy";
+
+        StringBuilder builder = new StringBuilder();
+        builder.AppendLine("You are generating a multiple-choice astronomy quiz for the AstroLearn Unity app.");
+        builder.AppendLine("Return valid JSON only. Do not use markdown fences, commentary, or extra text.");
+        builder.AppendLine("The JSON must match this exact schema:");
+        builder.AppendLine("{");
+        builder.AppendLine("  \"topic\": \"string\",");
+        builder.AppendLine("  \"difficulty\": \"string\",");
+        builder.AppendLine("  \"questions\": [");
+        builder.AppendLine("    {");
+        builder.AppendLine("      \"question\": \"string\",");
+        builder.AppendLine("      \"choices\": [\"string\", \"string\", \"string\", \"string\"],");
+        builder.AppendLine("      \"correctAnswer\": \"string\",");
+        builder.AppendLine("      \"explanation\": \"string\"");
+        builder.AppendLine("    }");
+        builder.AppendLine("  ]");
+        builder.AppendLine("}");
+        builder.AppendLine();
+        builder.AppendLine($"Generate exactly {LocalGeneratedQuestionCount} unique questions.");
+        builder.AppendLine($"Topic: {resolvedTopic}");
+        builder.AppendLine($"Difficulty: {resolvedDifficulty}");
+        builder.AppendLine("All questions must stay within astronomy and the Solar System.");
+        builder.AppendLine("Each question must have exactly 4 choices.");
+        builder.AppendLine("The correctAnswer must exactly match one of the 4 choices.");
+        builder.AppendLine("Avoid duplicate questions.");
+        builder.AppendLine("Keep each explanation to one short sentence.");
+        builder.AppendLine("Make the questions suitable for Grade 7 to Grade 12 learners.");
+        if (string.Equals(resolvedDifficulty, "Easy", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.AppendLine("Easy questions should focus on direct facts, recognition, and basic understanding.");
+        }
+        else
+        {
+            builder.AppendLine("Hard questions should focus on deeper reasoning, comparison, and inference while still being answerable by students.");
+        }
+
+        return builder.ToString();
     }
 
     private static List<QuizQuestionData> BuildEasyFallbackQuestionPool(string topic)

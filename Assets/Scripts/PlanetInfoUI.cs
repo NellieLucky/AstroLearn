@@ -22,6 +22,17 @@ public class PlanetInfoUI : MonoBehaviour
         Atmosphere
     }
 
+    private struct ExternalNavigationRestoreState
+    {
+        public bool HasState;
+        public string BodyName;
+        public bool UsesCelestialBodyUi;
+        public bool UsesSolarSystemUi;
+        public bool PanelVisible;
+        public bool ShowsBasicsTab;
+        public CelestialSection? ActiveSection;
+    }
+
     [Header("Selection")]
     public float selectionSphereRadius = 0.35f;
     public float selectionScreenThreshold = 120f;
@@ -74,6 +85,7 @@ public class PlanetInfoUI : MonoBehaviour
     public Image extrasButtonFill;
     public Button viewInArButton;
     public Image arPlanetIcon;
+    public Button quizButton;
     public Button imagesButton;
     public SolarAudioManager solarAudioManager;
     public GameObject imagesGalleryOverlay;
@@ -139,7 +151,14 @@ public class PlanetInfoUI : MonoBehaviour
     private Color basicsButtonFillOriginalColor = Color.white;
     private Color extrasButtonFillOriginalColor = Color.white;
     private Color soundButtonFillOriginalColor = Color.white;
+    private static ExternalNavigationRestoreState pendingExternalRestoreState;
     private bool showBasicsTab = true;
+    private bool hasStoredFocusedBodyRestoreState;
+    private bool storedRestoreUsesCelestialBodyUi;
+    private bool storedRestoreUsesSolarSystemUi;
+    private bool storedRestorePanelVisible;
+    private bool storedRestoreShowsBasicsTab = true;
+    private CelestialSection? storedRestoreActiveSection;
     private static readonly string[] FocusOrder =
     {
         "Sun",
@@ -174,6 +193,8 @@ public class PlanetInfoUI : MonoBehaviour
     private readonly Dictionary<CelestialBody, TMP_Text> solarSystemLabelMap = new Dictionary<CelestialBody, TMP_Text>();
     private GameObject solarSystemTopLeftMenuObject;
     private GameObject solarSystemTopLeftBackObject;
+    private GameObject solarSystemTopRightGroupObject;
+    private GameObject solarSystemBottomRightGroupObject;
     private GameObject celestialBodyTopLeftBackObject;
 
     private void Awake()
@@ -240,6 +261,20 @@ public class PlanetInfoUI : MonoBehaviour
             solarSystemTopLeftBackObject = focusBackButton != null
                 ? focusBackButton.gameObject
                 : FindChildObjectByName(FindChildObjectByName(solarSystemUiRoot, "TopLeftGroup"), "BackButton");
+        }
+
+        if (solarSystemTopRightGroupObject == null)
+        {
+            solarSystemTopRightGroupObject =
+                FindChildObjectByName(solarSystemUiRoot, "TopRightGroup") ??
+                FindObjectByName("TopRightGroup");
+        }
+
+        if (solarSystemBottomRightGroupObject == null)
+        {
+            solarSystemBottomRightGroupObject =
+                FindChildObjectByName(solarSystemUiRoot, "BottomRightGroup") ??
+                FindObjectByName("BottomRightGroup");
         }
 
         Button preferredCelestialBodyBackButton = FindComponentUnderNamedParent<Button>(celestialBodyUiRoot, "TopLeftControls", "BackButton");
@@ -412,6 +447,11 @@ public class PlanetInfoUI : MonoBehaviour
         if (arPlanetIcon == null && viewInArButton != null)
         {
             arPlanetIcon = FindComponentInChildrenByName<Image>(viewInArButton.gameObject, "ARPlanetIcon");
+        }
+
+        if (quizButton == null)
+        {
+            quizButton = FindComponentInChildrenByName<Button>(celestialBodyUiRoot, "QuizButton");
         }
 
         if (imagesButton == null)
@@ -871,6 +911,28 @@ public class PlanetInfoUI : MonoBehaviour
             imagesButton.onClick.AddListener(HandleImagesButton);
         }
 
+        if (quizButton != null)
+        {
+            AuthUIManager authUiManager = FindFirstObjectByType<AuthUIManager>();
+            if (authUiManager != null)
+            {
+                quizButton.onClick.RemoveListener(authUiManager.OpenQuizFromButton);
+            }
+
+            quizButton.onClick.AddListener(HandleQuizButton);
+        }
+
+        if (viewInArButton != null)
+        {
+            ARSceneLauncher launcher = viewInArButton.GetComponent<ARSceneLauncher>();
+            if (launcher != null)
+            {
+                viewInArButton.onClick.RemoveListener(launcher.OpenArScene);
+            }
+
+            viewInArButton.onClick.AddListener(HandleViewInArButton);
+        }
+
         if (galleryBackButton != null)
         {
             galleryBackButton.onClick.AddListener(HandleGalleryBackButton);
@@ -1086,6 +1148,16 @@ public class PlanetInfoUI : MonoBehaviour
         if (imageCaptionShowButton != null)
         {
             imageCaptionShowButton.onClick.RemoveListener(HandleImageCaptionShowButton);
+        }
+
+        if (quizButton != null)
+        {
+            quizButton.onClick.RemoveListener(HandleQuizButton);
+        }
+
+        if (viewInArButton != null)
+        {
+            viewInArButton.onClick.RemoveListener(HandleViewInArButton);
         }
 
     }
@@ -1439,6 +1511,60 @@ public class PlanetInfoUI : MonoBehaviour
             currentBody = FindBodyByName("Sun");
         }
 
+        ShowCelestialBodyViewForCurrentBody();
+    }
+
+    private IEnumerator RefreshFocusedUiAfterVisit()
+    {
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+        UpdateFocusedUi();
+        UpdateTopLeftNavigationButtons();
+        visitRefreshCoroutine = null;
+    }
+
+    public bool RestoreFocusedBodyUiFromExternalNavigation()
+    {
+        if (currentBody == null && !ApplyPendingExternalRestoreStateToInstance())
+        {
+            return false;
+        }
+
+        if (currentBody == null)
+        {
+            return false;
+        }
+
+        if (!hasStoredFocusedBodyRestoreState)
+        {
+            ShowCelestialBodyViewForCurrentBody();
+            ClearPendingExternalRestoreState();
+            return true;
+        }
+
+        RestoreStoredFocusedBodyUiState();
+        ClearPendingExternalRestoreState();
+        return true;
+    }
+
+    public static bool HasPendingExternalRestoreState()
+    {
+        return pendingExternalRestoreState.HasState &&
+               !string.IsNullOrWhiteSpace(pendingExternalRestoreState.BodyName);
+    }
+
+    public static void ClearPendingExternalRestoreState()
+    {
+        pendingExternalRestoreState = default;
+    }
+
+    private void ShowCelestialBodyViewForCurrentBody()
+    {
+        if (currentBody == null)
+        {
+            return;
+        }
+
         CloseGalleryOverlays();
 
         if (celestialBodyUiRoot != null)
@@ -1451,6 +1577,7 @@ public class PlanetInfoUI : MonoBehaviour
             solarSystemUiRoot.SetActive(false);
         }
 
+        ApplyFocusedWorldState(currentBody);
         IsolateVisitedCelestialBody(currentBody);
 
         ShowBasicsTab(true);
@@ -1468,13 +1595,138 @@ public class PlanetInfoUI : MonoBehaviour
         UpdateTopLeftNavigationButtons();
     }
 
-    private IEnumerator RefreshFocusedUiAfterVisit()
+    private void CaptureFocusedBodyUiStateForExternalNavigation()
     {
-        yield return null;
+        hasStoredFocusedBodyRestoreState = true;
+        storedRestoreUsesCelestialBodyUi = celestialBodyUiRoot != null && celestialBodyUiRoot.activeInHierarchy;
+        storedRestoreUsesSolarSystemUi = solarSystemUiRoot != null && solarSystemUiRoot.activeInHierarchy;
+        storedRestorePanelVisible = panel != null && panel.activeSelf;
+        storedRestoreShowsBasicsTab = showBasicsTab;
+        storedRestoreActiveSection = activeSection;
+
+        if (currentBody == null || string.IsNullOrWhiteSpace(currentBody.bodyName))
+        {
+            ClearPendingExternalRestoreState();
+            return;
+        }
+
+        pendingExternalRestoreState = new ExternalNavigationRestoreState
+        {
+            HasState = true,
+            BodyName = currentBody.bodyName,
+            UsesCelestialBodyUi = storedRestoreUsesCelestialBodyUi,
+            UsesSolarSystemUi = storedRestoreUsesSolarSystemUi,
+            PanelVisible = storedRestorePanelVisible,
+            ShowsBasicsTab = storedRestoreShowsBasicsTab,
+            ActiveSection = storedRestoreActiveSection
+        };
+    }
+
+    private void RestoreStoredFocusedBodyUiState()
+    {
+        CloseGalleryOverlays();
+
+        if (celestialBodyUiRoot != null)
+        {
+            celestialBodyUiRoot.SetActive(storedRestoreUsesCelestialBodyUi);
+        }
+
+        if (solarSystemUiRoot != null)
+        {
+            solarSystemUiRoot.SetActive(storedRestoreUsesSolarSystemUi);
+        }
+
+        if (panel != null)
+        {
+            panel.SetActive(storedRestorePanelVisible);
+        }
+
+        ApplyFocusedWorldState(currentBody);
+        IsolateVisitedCelestialBody(currentBody);
+
+        if (storedRestoreShowsBasicsTab)
+        {
+            ShowBasicsTab(false);
+        }
+        else
+        {
+            ShowExtrasTab(false);
+        }
+
         Canvas.ForceUpdateCanvases();
         UpdateFocusedUi();
+
+        if (storedRestoreUsesCelestialBodyUi && storedRestoreActiveSection.HasValue)
+        {
+            SetActiveSection(storedRestoreActiveSection.Value);
+        }
+        else
+        {
+            HideAllSectionsImmediately();
+            activeSection = null;
+            UpdateNavigationButtonVisuals(null);
+            UpdateInspectCameraPanelOffset(false);
+        }
+
+        if (visitRefreshCoroutine != null)
+        {
+            StopCoroutine(visitRefreshCoroutine);
+        }
+
+        visitRefreshCoroutine = StartCoroutine(RefreshFocusedUiAfterVisit());
         UpdateTopLeftNavigationButtons();
-        visitRefreshCoroutine = null;
+    }
+
+    private void ApplyFocusedWorldState(CelestialBody body)
+    {
+        if (body == null)
+        {
+            return;
+        }
+
+        SetCelestialMotionEnabled(false);
+        SetOrbitLinesVisible(false);
+        SetSimulationControlsVisible(false);
+
+        body.ResetToDefaultOrientation();
+
+        if (orbitCamera != null)
+        {
+            GetAutoFocusSettings(body.transform, out float autoFocusDistance, out float autoMinFocusDistance, out float autoMaxFocusDistance);
+            body.GetFocusDistances(autoFocusDistance, autoMinFocusDistance, autoMaxFocusDistance,
+                out float focusDistance, out float minFocusDistance, out float maxFocusDistance);
+            Quaternion defaultViewRotation = GetDefaultFocusViewRotation(body);
+
+            orbitCamera.FocusOnTarget(
+                body.transform,
+                focusDistance,
+                minFocusDistance,
+                maxFocusDistance,
+                defaultViewRotation);
+        }
+    }
+
+    private bool ApplyPendingExternalRestoreStateToInstance()
+    {
+        if (!HasPendingExternalRestoreState())
+        {
+            return false;
+        }
+
+        CelestialBody restoredBody = FindBodyByName(pendingExternalRestoreState.BodyName);
+        if (restoredBody == null)
+        {
+            return false;
+        }
+
+        currentBody = restoredBody;
+        hasStoredFocusedBodyRestoreState = pendingExternalRestoreState.HasState;
+        storedRestoreUsesCelestialBodyUi = pendingExternalRestoreState.UsesCelestialBodyUi;
+        storedRestoreUsesSolarSystemUi = pendingExternalRestoreState.UsesSolarSystemUi;
+        storedRestorePanelVisible = pendingExternalRestoreState.PanelVisible;
+        storedRestoreShowsBasicsTab = pendingExternalRestoreState.ShowsBasicsTab;
+        storedRestoreActiveSection = pendingExternalRestoreState.ActiveSection;
+        return true;
     }
 
     private void HandleTargetButton()
@@ -1502,8 +1754,7 @@ public class PlanetInfoUI : MonoBehaviour
     {
         bool isFocusedPlanetView =
             currentBody != null &&
-            celestialBodyUiRoot != null &&
-            !celestialBodyUiRoot.activeInHierarchy;
+            (celestialBodyUiRoot == null || !celestialBodyUiRoot.activeInHierarchy);
 
         bool isCelestialBodyViewActive =
             celestialBodyUiRoot != null &&
@@ -1535,6 +1786,15 @@ public class PlanetInfoUI : MonoBehaviour
         }
 
         SetMenuIconVisibility(celestialBodyTopLeftBackObject, false);
+        UpdateRightSideNavigationButtons(isFocusedPlanetView, isSolarSystemViewActive);
+    }
+
+    private void UpdateRightSideNavigationButtons(bool isFocusedPlanetView, bool isSolarSystemViewActive)
+    {
+        bool shouldShow = isSolarSystemViewActive && !isFocusedPlanetView;
+
+        SetObjectActiveIfChanged(solarSystemTopRightGroupObject, shouldShow);
+        SetObjectActiveIfChanged(solarSystemBottomRightGroupObject, shouldShow);
     }
 
     private static void SetMenuIconVisibility(GameObject buttonObject, bool isVisible)
@@ -1549,6 +1809,16 @@ public class PlanetInfoUI : MonoBehaviour
         {
             menuIconObject.SetActive(isVisible);
         }
+    }
+
+    private static void SetObjectActiveIfChanged(GameObject targetObject, bool isActive)
+    {
+        if (targetObject == null || targetObject.activeSelf == isActive)
+        {
+            return;
+        }
+
+        targetObject.SetActive(isActive);
     }
 
     private void UpdateCelestialBodyImage(CelestialBody body)
@@ -2570,26 +2840,7 @@ public class PlanetInfoUI : MonoBehaviour
             SetActiveSection(CelestialSection.PlanetaryProfile);
         }
 
-        SetCelestialMotionEnabled(false);
-        SetOrbitLinesVisible(false);
-        SetSimulationControlsVisible(false);
-
-        body.ResetToDefaultOrientation();
-
-        if (orbitCamera != null)
-        {
-            GetAutoFocusSettings(body.transform, out float autoFocusDistance, out float autoMinFocusDistance, out float autoMaxFocusDistance);
-            body.GetFocusDistances(autoFocusDistance, autoMinFocusDistance, autoMaxFocusDistance,
-                out float focusDistance, out float minFocusDistance, out float maxFocusDistance);
-            Quaternion defaultViewRotation = GetDefaultFocusViewRotation(body);
-
-            orbitCamera.FocusOnTarget(
-                body.transform,
-                focusDistance,
-                minFocusDistance,
-                maxFocusDistance,
-                defaultViewRotation);
-        }
+        ApplyFocusedWorldState(body);
 
         UpdateInspectCameraPanelOffset(activeSection.HasValue);
     }
@@ -2651,6 +2902,65 @@ public class PlanetInfoUI : MonoBehaviour
         }
 
         UpdateInspectCameraPanelOffset(false);
+    }
+
+    private void HandleQuizButton()
+    {
+        if (currentBody == null)
+        {
+            return;
+        }
+
+        CaptureFocusedBodyUiStateForExternalNavigation();
+
+        AuthUIManager authUiManager = FindFirstObjectByType<AuthUIManager>();
+        if (authUiManager == null)
+        {
+            Debug.LogWarning("[PlanetInfoUI] AuthUIManager not found while opening the focused-body quiz flow.");
+            return;
+        }
+
+        authUiManager.OpenQuizHomeForTopic(currentBody.bodyName);
+    }
+
+    private void HandleViewInArButton()
+    {
+        if (currentBody == null || viewInArButton == null)
+        {
+            return;
+        }
+
+        CaptureFocusedBodyUiStateForExternalNavigation();
+        ARBodySelectionContext.SetSelectedBody(currentBody);
+
+        ARSceneLauncher launcher = viewInArButton.GetComponent<ARSceneLauncher>();
+        if (launcher == null)
+        {
+            launcher = viewInArButton.gameObject.AddComponent<ARSceneLauncher>();
+        }
+
+        ARSceneLauncher templateLauncher = FindSceneArLauncher(launcher);
+        if (templateLauncher != null)
+        {
+            launcher.CopyConfigurationFrom(templateLauncher);
+        }
+
+        launcher.OpenArScene();
+    }
+
+    private static ARSceneLauncher FindSceneArLauncher(ARSceneLauncher excludedLauncher)
+    {
+        ARSceneLauncher[] launchers = FindObjectsByType<ARSceneLauncher>(FindObjectsSortMode.None);
+        for (int i = 0; i < launchers.Length; i++)
+        {
+            ARSceneLauncher launcher = launchers[i];
+            if (launcher != null && launcher != excludedLauncher && launcher.gameObject.scene.IsValid())
+            {
+                return launcher;
+            }
+        }
+
+        return null;
     }
 
     private void HandleSoundButton()
@@ -2784,6 +3094,8 @@ public class PlanetInfoUI : MonoBehaviour
 
     private void SetCelestialMotionEnabled(bool isEnabled)
     {
+        EnsureSimulationRuntimeCaches();
+
         foreach (OrbitAroundSun orbitScript in orbitAroundSunScripts)
         {
             orbitScript.enabled = isEnabled;
@@ -2802,6 +3114,8 @@ public class PlanetInfoUI : MonoBehaviour
 
     private void SetOrbitLinesVisible(bool isVisible)
     {
+        EnsureSimulationRuntimeCaches();
+
         if (orbitSnakeTrails == null)
         {
             return;
@@ -2819,6 +3133,29 @@ public class PlanetInfoUI : MonoBehaviour
             {
                 lineRenderer.enabled = isVisible;
             }
+        }
+    }
+
+    private void EnsureSimulationRuntimeCaches()
+    {
+        if (orbitAroundSunScripts == null || orbitAroundSunScripts.Length == 0)
+        {
+            orbitAroundSunScripts = FindObjectsByType<OrbitAroundSun>(FindObjectsSortMode.None);
+        }
+
+        if (orbitAroundPlanetScripts == null || orbitAroundPlanetScripts.Length == 0)
+        {
+            orbitAroundPlanetScripts = FindObjectsByType<OrbitAroundPlanet>(FindObjectsSortMode.None);
+        }
+
+        if (rotationScripts == null || rotationScripts.Length == 0)
+        {
+            rotationScripts = FindObjectsByType<PlanetRotation>(FindObjectsSortMode.None);
+        }
+
+        if (orbitSnakeTrails == null || orbitSnakeTrails.Length == 0)
+        {
+            orbitSnakeTrails = FindObjectsByType<OrbitSnakeTrail>(FindObjectsSortMode.None);
         }
     }
 
@@ -3551,6 +3888,21 @@ public class PlanetInfoUI : MonoBehaviour
         SetSectionVisible(orbitCharacteristicsPanel, visibleSection == CelestialSection.OrbitCharacteristics);
         SetSectionVisible(structurePanel, visibleSection == CelestialSection.Structure);
         SetSectionVisible(atmospherePanel, visibleSection == CelestialSection.Atmosphere);
+    }
+
+    private void HideAllSectionsImmediately()
+    {
+        HideSectionImmediately(planetaryProfilePanel, GetStoredAnchoredPosition(CelestialSection.PlanetaryProfile));
+        HideSectionImmediately(statsPanel, GetStoredAnchoredPosition(CelestialSection.Stats));
+        HideSectionImmediately(orbitCharacteristicsPanel, GetStoredAnchoredPosition(CelestialSection.OrbitCharacteristics));
+        HideSectionImmediately(structurePanel, GetStoredAnchoredPosition(CelestialSection.Structure));
+        HideSectionImmediately(atmospherePanel, GetStoredAnchoredPosition(CelestialSection.Atmosphere));
+
+        SetSectionVisible(planetaryProfilePanel, false);
+        SetSectionVisible(statsPanel, false);
+        SetSectionVisible(orbitCharacteristicsPanel, false);
+        SetSectionVisible(structurePanel, false);
+        SetSectionVisible(atmospherePanel, false);
     }
 
     private GameObject GetPanelForSection(CelestialSection section)

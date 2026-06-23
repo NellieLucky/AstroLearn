@@ -6,7 +6,14 @@ using TMPro;
 
 public class AuthUIManager : MonoBehaviour
 {
+    private enum QuizReturnTarget
+    {
+        SolarSystem,
+        FocusedCelestialBody
+    }
+
     public static bool ForceSolarSystemUiOnNextStart { get; set; }
+    public static bool SuppressStartupFlowOnNextStart { get; set; }
 
     [SerializeField] private float splashPageDuration = 2f;
 
@@ -73,10 +80,12 @@ public class AuthUIManager : MonoBehaviour
     private Button quizButton;
     private Button askAiButton;
     private readonly List<Button> quizBackButtons = new List<Button>();
+    private Button quizHomeBackButton;
     private Button quizIntroBackButton;
     private Button quizIntroStartButton;
     private Button quizHistoryBackButton;
     private Button aiExitButton;
+    private QuizReturnTarget quizReturnTarget = QuizReturnTarget.SolarSystem;
 
     private TMP_InputField logInEmailInputField;
     private TMP_InputField logInPasswordInputField;
@@ -144,6 +153,22 @@ public class AuthUIManager : MonoBehaviour
 
     private void Start()
     {
+        if (SuppressStartupFlowOnNextStart)
+        {
+            SuppressStartupFlowOnNextStart = false;
+            RefreshSceneBindings();
+
+            if (launchUiRoot != null)
+            {
+                launchUiRoot.SetActive(false);
+            }
+
+            SetPageActive(menuRoot, false);
+            SetLoadingState(false);
+            ApplyHistoryAccessState();
+            return;
+        }
+
         if (ForceSolarSystemUiOnNextStart)
         {
             ForceSolarSystemUiOnNextStart = false;
@@ -468,6 +493,11 @@ public class AuthUIManager : MonoBehaviour
         {
             quizBackButtons.Add(quizTopicBackButton);
         }
+        quizHomeBackButton = FindButton(quizHomePage, "BackButton");
+        if (quizHomeBackButton != null)
+        {
+            quizBackButtons.Add(quizHomeBackButton);
+        }
         quizIntroBackButton = FindButton(quizIntroPage, "BackButton");
 
         quizIntroStartButton = FindButton(quizIntroPage, "StartQuizButton") ?? FindButtonByChildText(quizIntroPage, "START QUIZ");
@@ -550,7 +580,7 @@ public class AuthUIManager : MonoBehaviour
         AddListener(askAiButton, ShowAiUi);
         foreach (Button button in quizBackButtons)
         {
-            AddListener(button, ShowSolarSystemUiOnly);
+            AddListener(button, HandleQuizBackNavigation);
         }
         foreach (Button button in quizHistoryButtons)
         {
@@ -613,7 +643,7 @@ public class AuthUIManager : MonoBehaviour
         RemoveListener(askAiButton, ShowAiUi);
         foreach (Button button in quizBackButtons)
         {
-            RemoveListener(button, ShowSolarSystemUiOnly);
+            RemoveListener(button, HandleQuizBackNavigation);
         }
         foreach (Button button in quizHistoryButtons)
         {
@@ -1839,6 +1869,49 @@ public class AuthUIManager : MonoBehaviour
     {
         Debug.Log($"[AuthUIManager] ShowQuizUi invoked. quizUiRoot={(quizUiRoot != null ? quizUiRoot.activeInHierarchy.ToString() : "null")}, quizTopicPage={(quizTopicPage != null ? quizTopicPage.activeSelf.ToString() : "null")}, quizUiContainerRoot={(quizUiContainerRoot != null ? quizUiContainerRoot.activeInHierarchy.ToString() : "null")}");
 
+        quizReturnTarget = QuizReturnTarget.SolarSystem;
+        PrepareQuizUiShell();
+
+        QuizTopicGenerator topicGenerator = FindQuizTopicGeneratorAnyState();
+        if (topicGenerator != null)
+        {
+            topicGenerator.RefreshForOpen();
+            return;
+        }
+
+        // Set QuizTopicPage active and deactivate all other pages under QuizUI
+        SetPageActive(quizTopicPage, true);
+        SetPageActive(quizHomePage, false);
+        SetPageActive(quizQuestionPage, false);
+        SetPageActive(quizResultPage, false);
+        SetPageActive(quizHistoryPage, false);
+        SetPageActive(quizIntroPage, false);
+        SetPageActive(quizBreakdownPage, false);
+    }
+
+    public void OpenQuizHomeForTopic(string topicName)
+    {
+        quizReturnTarget = QuizReturnTarget.FocusedCelestialBody;
+        PrepareQuizUiShell();
+
+        QuizTopicGenerator topicGenerator = FindQuizTopicGeneratorAnyState();
+        if (topicGenerator != null)
+        {
+            topicGenerator.OpenQuizHomeForTopic(topicName);
+            return;
+        }
+
+        SetPageActive(quizTopicPage, false);
+        SetPageActive(quizHomePage, true);
+        SetPageActive(quizQuestionPage, false);
+        SetPageActive(quizResultPage, false);
+        SetPageActive(quizHistoryPage, false);
+        SetPageActive(quizIntroPage, false);
+        SetPageActive(quizBreakdownPage, false);
+    }
+
+    private void PrepareQuizUiShell()
+    {
         SetPageActive(menuRoot, false);
         if (launchUiRoot != null) launchUiRoot.SetActive(false);
         if (solarSystemUiRoot != null) solarSystemUiRoot.SetActive(false);
@@ -1870,27 +1943,115 @@ public class AuthUIManager : MonoBehaviour
             GameObject controllerObject = new GameObject("QuizFlowController");
             controllerObject.AddComponent<QuizFlowController>();
         }
-
-        QuizTopicGenerator topicGenerator = FindFirstObjectByType<QuizTopicGenerator>();
-        if (topicGenerator != null)
-        {
-            topicGenerator.RefreshForOpen();
-            return;
-        }
-
-        // Set QuizTopicPage active and deactivate all other pages under QuizUI
-        SetPageActive(quizTopicPage, true);
-        SetPageActive(quizHomePage, false);
-        SetPageActive(quizQuestionPage, false);
-        SetPageActive(quizResultPage, false);
-        SetPageActive(quizHistoryPage, false);
-        SetPageActive(quizIntroPage, false);
-        SetPageActive(quizBreakdownPage, false);
     }
 
     public void OpenQuizFromButton()
     {
         ShowQuizUi();
+    }
+
+    public bool IsFocusedCelestialBodyQuizFlowActive()
+    {
+        return quizReturnTarget == QuizReturnTarget.FocusedCelestialBody;
+    }
+
+    public bool TryRestoreFocusedCelestialBodyFromQuiz()
+    {
+        if (quizReturnTarget != QuizReturnTarget.FocusedCelestialBody)
+        {
+            return false;
+        }
+
+        return RestoreFocusedCelestialBodyAfterQuiz();
+    }
+
+    private static QuizTopicGenerator FindQuizTopicGeneratorAnyState()
+    {
+        QuizTopicGenerator activeGenerator = FindFirstObjectByType<QuizTopicGenerator>();
+        if (activeGenerator != null)
+        {
+            return activeGenerator;
+        }
+
+        QuizTopicGenerator[] generators = Resources.FindObjectsOfTypeAll<QuizTopicGenerator>();
+        for (int i = 0; i < generators.Length; i++)
+        {
+            QuizTopicGenerator generator = generators[i];
+            if (generator != null && generator.gameObject.scene.IsValid())
+            {
+                return generator;
+            }
+        }
+
+        return null;
+    }
+
+    private void HandleQuizBackNavigation()
+    {
+        if (quizReturnTarget == QuizReturnTarget.FocusedCelestialBody && RestoreFocusedCelestialBodyAfterQuiz())
+        {
+            return;
+        }
+
+        quizReturnTarget = QuizReturnTarget.SolarSystem;
+        ShowSolarSystemUiOnly();
+    }
+
+    private bool RestoreFocusedCelestialBodyAfterQuiz()
+    {
+        if (quizUiRoot != null)
+        {
+            quizUiRoot.SetActive(false);
+        }
+
+        if (quizUiContainerRoot != null && quizUiContainerRoot != quizUiRoot)
+        {
+            quizUiContainerRoot.SetActive(false);
+        }
+
+        if (aiUiRoot != null)
+        {
+            aiUiRoot.SetActive(false);
+        }
+
+        if (arUiRoot != null)
+        {
+            arUiRoot.SetActive(false);
+        }
+
+        if (imagesGalleryOverlay != null)
+        {
+            imagesGalleryOverlay.SetActive(false);
+        }
+
+        if (imageViewerOverlay != null)
+        {
+            imageViewerOverlay.SetActive(false);
+        }
+
+        if (solarSystemRoot != null)
+        {
+            solarSystemRoot.SetActive(true);
+        }
+
+        PlanetInfoUI planetInfoUi = FindFirstObjectByType<PlanetInfoUI>();
+        if (planetInfoUi == null || !planetInfoUi.RestoreFocusedBodyUiFromExternalNavigation())
+        {
+            return false;
+        }
+
+        if (solarSystemUiRoot != null)
+        {
+            solarSystemUiRoot.SetActive(false);
+        }
+
+        if (planetInfoCard != null)
+        {
+            planetInfoCard.SetActive(false);
+        }
+
+        quizReturnTarget = QuizReturnTarget.SolarSystem;
+        return true;
     }
 
     private void ShowQuizHistoryPage()

@@ -43,6 +43,8 @@ public class ARSceneLauncher : MonoBehaviour
             loadingPanel = FindLoadingPanel();
         }
 
+        ApplyLoadingPanelText();
+
         LastNonArSceneName = SceneManager.GetActiveScene().name;
         StartCoroutine(OpenArSceneRoutine());
     }
@@ -254,6 +256,58 @@ public class ARSceneLauncher : MonoBehaviour
         {
             canvasRect.localScale = Vector3.one;
         }
+    }
+
+    private void ApplyLoadingPanelText()
+    {
+        if (loadingPanel == null)
+        {
+            return;
+        }
+
+        string loadingMessage = ARBodySelectionContext.GetLoadingMessage();
+        ARLoadingPanelAnimator loadingAnimator = loadingPanel.GetComponent<ARLoadingPanelAnimator>();
+        if (loadingAnimator != null)
+        {
+            loadingAnimator.SetBaseText(loadingMessage);
+            return;
+        }
+
+        TMP_Text tmpText = FindComponentInChildrenByName<TMP_Text>(loadingPanel.transform, "LoadingText");
+        if (tmpText != null)
+        {
+            tmpText.text = loadingMessage;
+        }
+
+        Text legacyText = FindComponentInChildrenByName<Text>(loadingPanel.transform, "LoadingText");
+        if (legacyText != null)
+        {
+            legacyText.text = loadingMessage;
+        }
+    }
+
+    private static T FindComponentInChildrenByName<T>(Transform parent, string targetName) where T : Component
+    {
+        if (parent == null || string.IsNullOrWhiteSpace(targetName))
+        {
+            return null;
+        }
+
+        if (parent.name == targetName)
+        {
+            return parent.GetComponent<T>();
+        }
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            T found = FindComponentInChildrenByName<T>(parent.GetChild(i), targetName);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 
     private GameObject FindLoadingPanel()

@@ -11,6 +11,7 @@ public class SceneReturnCoordinator : MonoBehaviour
     private static string pendingMessage;
     private static bool hasPendingReturn;
     private AuthUIManager preparedAuthUiManager;
+    private bool restoredFocusedBodyView;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Register()
@@ -34,7 +35,8 @@ public class SceneReturnCoordinator : MonoBehaviour
         hasPendingReturn = true;
         if (sceneName == "SolarSystemScene")
         {
-            AuthUIManager.ForceSolarSystemUiOnNextStart = true;
+            AuthUIManager.SuppressStartupFlowOnNextStart = true;
+            AuthUIManager.ForceSolarSystemUiOnNextStart = !PlanetInfoUI.HasPendingExternalRestoreState();
         }
         Time.timeScale = 1f;
         SceneManager.LoadScene(sceneName);
@@ -65,9 +67,8 @@ public class SceneReturnCoordinator : MonoBehaviour
 
     private IEnumerator RestoreSolarSystemUiRoutine()
     {
-        yield return null;
-
         preparedAuthUiManager = null;
+        restoredFocusedBodyView = false;
 
         GameObject launchUiRoot = FindSceneObjectByName("LaunchUI");
         GameObject loadingPanel = FindSceneObjectByName("ARLoadingPanel");
@@ -140,12 +141,19 @@ public class SceneReturnCoordinator : MonoBehaviour
 
             if (restoreCompleted)
             {
-                if (preparedAuthUiManager != null)
+                if (TryRestoreFocusedBodyView())
                 {
-                    preparedAuthUiManager.ForceShowSolarSystemUiOnly();
+                    EnforceFocusedBodySceneObjects();
                 }
+                else
+                {
+                    if (preparedAuthUiManager != null)
+                    {
+                        preparedAuthUiManager.ForceShowSolarSystemUiOnly();
+                    }
 
-                EnforceSolarSystemSceneObjects();
+                    EnforceSolarSystemSceneObjects();
+                }
             }
             else
             {
@@ -199,6 +207,31 @@ public class SceneReturnCoordinator : MonoBehaviour
         HideSolarSystemSceneObjects();
     }
 
+    private bool TryRestoreFocusedBodyView()
+    {
+        if (restoredFocusedBodyView)
+        {
+            return true;
+        }
+
+        if (!PlanetInfoUI.HasPendingExternalRestoreState())
+        {
+            return false;
+        }
+
+        SetActiveIfFound("SolarSystemRoot", true);
+
+        PlanetInfoUI planetInfoUi = Object.FindFirstObjectByType<PlanetInfoUI>();
+        if (planetInfoUi == null || !planetInfoUi.RestoreFocusedBodyUiFromExternalNavigation())
+        {
+            PlanetInfoUI.ClearPendingExternalRestoreState();
+            return false;
+        }
+
+        restoredFocusedBodyView = true;
+        return true;
+    }
+
     private static void EnforceSolarSystemSceneObjects()
     {
         SetActiveIfFound("SolarSystemUI", true);
@@ -207,6 +240,17 @@ public class SceneReturnCoordinator : MonoBehaviour
         SetActiveIfFound("Canvas", true);
         SetActiveIfFound("Menu", false);
         SetActiveIfFound("ChatbotCanvas", false);
+    }
+
+    private static void EnforceFocusedBodySceneObjects()
+    {
+        SetActiveIfFound("SolarSystemUI", false);
+        SetActiveIfFound("SolarSystemRoot", true);
+        SetActiveIfFound("CelestialBodyUI", true);
+        SetActiveIfFound("Canvas", true);
+        SetActiveIfFound("Menu", false);
+        SetActiveIfFound("ChatbotCanvas", false);
+        SetActiveIfFound("QuizManager", false);
     }
 
     private static void HideSolarSystemSceneObjects()

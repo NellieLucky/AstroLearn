@@ -43,6 +43,11 @@ public static class SolarSystemSceneButtonAutoBinder
 
                 case "QuizButton":
                 case "QuizTopicButton":
+                    if (!HasAncestorNamed(button.transform, "TopRightGroup"))
+                    {
+                        break;
+                    }
+
                     button.onClick.RemoveListener(authUiManager.OpenQuizFromButton);
                     button.onClick.AddListener(authUiManager.OpenQuizFromButton);
                     break;
@@ -115,6 +120,27 @@ public static class SolarSystemSceneButtonAutoBinder
         return string.IsNullOrWhiteSpace(value)
             ? string.Empty
             : value.Replace('\r', ' ').Replace('\n', ' ').Trim().ToUpperInvariant();
+    }
+
+    private static bool HasAncestorNamed(Transform transform, string ancestorName)
+    {
+        if (transform == null || string.IsNullOrWhiteSpace(ancestorName))
+        {
+            return false;
+        }
+
+        Transform current = transform;
+        while (current != null)
+        {
+            if (current.name == ancestorName)
+            {
+                return true;
+            }
+
+            current = current.parent;
+        }
+
+        return false;
     }
 
     private static void BindArOpen(Button button, ARSceneLauncher templateLauncher)

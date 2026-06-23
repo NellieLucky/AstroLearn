@@ -45294,6 +45294,7 @@ MonoBehaviour:
   extrasButtonFill: {fileID: 0}
   viewInArButton: {fileID: 0}
   arPlanetIcon: {fileID: 0}
+  quizButton: {fileID: 0}
   imagesButton: {fileID: 0}
   solarAudioManager: {fileID: 1987567496}
   imagesGalleryOverlay: {fileID: 0}
