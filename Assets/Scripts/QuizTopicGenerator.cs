@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,6 +45,8 @@ public class QuizTopicGenerator : MonoBehaviour
     private string currentDifficulty = "Easy";
     private bool introBackReturnsToQuizHome;
     private readonly Dictionary<string, Button> topicButtonsByName = new Dictionary<string, Button>();
+    private Coroutine introLoadingAnimationCoroutine;
+    private MonoBehaviour introLoadingAnimationHost;
 
     private void Start()
     {
@@ -79,6 +82,7 @@ public class QuizTopicGenerator : MonoBehaviour
     private void InitializeQuizUi()
     {
         ResolveQuizPageReferences();
+        EnsureMoonTopicExists();
         ConfigureSelectedTopicLabel();
         ConfigureIntroTextLabel();
         if (topicContainer != null && topicButtonPrefab != null)
@@ -121,6 +125,47 @@ public class QuizTopicGenerator : MonoBehaviour
         }
 
         UpdateDifficultyButtonVisuals();
+    }
+
+    private void EnsureMoonTopicExists()
+    {
+        if (quizTopics == null)
+        {
+            quizTopics = new List<QuizTopicData>();
+        }
+
+        if (!quizTopics.Exists(t => string.Equals(t.topicName, "Moon", System.StringComparison.OrdinalIgnoreCase)))
+        {
+            Sprite moonSprite = null;
+            CelestialBody[] bodies = FindObjectsByType<CelestialBody>(FindObjectsSortMode.None);
+            foreach (CelestialBody body in bodies)
+            {
+                if (body != null && string.Equals(body.bodyName, "Moon", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    moonSprite = body.profileImage;
+                    break;
+                }
+            }
+
+            if (moonSprite != null)
+            {
+                QuizTopicData moonTopic = new QuizTopicData
+                {
+                    topicName = "Moon",
+                    topicSprite = moonSprite
+                };
+
+                int earthIndex = quizTopics.FindIndex(t => string.Equals(t.topicName, "Earth", System.StringComparison.OrdinalIgnoreCase));
+                if (earthIndex >= 0)
+                {
+                    quizTopics.Insert(earthIndex + 1, moonTopic);
+                }
+                else
+                {
+                    quizTopics.Add(moonTopic);
+                }
+            }
+        }
     }
 
     private void GenerateTopicButtons()
@@ -261,7 +306,7 @@ public class QuizTopicGenerator : MonoBehaviour
 
         if (introTextLabel != null)
         {
-            introTextLabel.text = $"Generating {currentDifficulty.ToLower()} questions about {resolvedTopicName}...";
+            StartIntroLoadingAnimation(resolvedTopicName);
         }
 
         if (QuizFlowController.Instance == null)
@@ -277,6 +322,8 @@ public class QuizTopicGenerator : MonoBehaviour
 
     private void RestoreIntroPrompt(string topicName)
     {
+        StopIntroLoadingAnimation();
+
         if (introStartQuizButton != null)
         {
             introStartQuizButton.interactable = true;
@@ -285,6 +332,55 @@ public class QuizTopicGenerator : MonoBehaviour
         if (introTextLabel != null)
         {
             introTextLabel.text = BuildIntroPrompt(topicName, currentDifficulty);
+        }
+    }
+
+    private void StartIntroLoadingAnimation(string topicName)
+    {
+        StopIntroLoadingAnimation();
+
+        string resolvedTopicName = GetResolvedSelectedTopic(topicName);
+        string resolvedDifficulty = NormalizeDifficulty(currentDifficulty);
+        MonoBehaviour coroutineHost = ResolveIntroLoadingAnimationHost();
+        if (coroutineHost == null)
+        {
+            if (introTextLabel != null)
+            {
+                introTextLabel.text = BuildGeneratingPrompt(resolvedTopicName, resolvedDifficulty, "...");
+            }
+
+            return;
+        }
+
+        introLoadingAnimationHost = coroutineHost;
+        introLoadingAnimationCoroutine = coroutineHost.StartCoroutine(AnimateIntroLoadingText(resolvedTopicName, resolvedDifficulty));
+    }
+
+    private void StopIntroLoadingAnimation()
+    {
+        if (introLoadingAnimationCoroutine != null && introLoadingAnimationHost != null)
+        {
+            introLoadingAnimationHost.StopCoroutine(introLoadingAnimationCoroutine);
+            introLoadingAnimationCoroutine = null;
+        }
+
+        introLoadingAnimationHost = null;
+    }
+
+    private IEnumerator AnimateIntroLoadingText(string topicName, string difficulty)
+    {
+        int dotCount = 0;
+
+        while (true)
+        {
+            if (introTextLabel != null)
+            {
+                string ellipsis = new string('.', dotCount + 1);
+                introTextLabel.text = BuildGeneratingPrompt(topicName, difficulty, ellipsis);
+            }
+
+            dotCount = (dotCount + 1) % 3;
+            yield return new WaitForSecondsRealtime(0.45f);
         }
     }
 
@@ -416,6 +512,47 @@ public class QuizTopicGenerator : MonoBehaviour
             : "easy";
 
         return $"Can you answer {promptTone} questions about {topicName}?";
+    }
+
+    private static string BuildGeneratingPrompt(string topicName, string difficulty, string ellipsis)
+    {
+        string resolvedTopicName = string.IsNullOrWhiteSpace(topicName) ? "this topic" : topicName.Trim();
+        string resolvedDifficulty = NormalizeDifficulty(difficulty);
+        return $"Generating {resolvedDifficulty} questions about {resolvedTopicName}{ellipsis}";
+    }
+
+    private static string NormalizeDifficulty(string difficulty)
+    {
+        if (string.IsNullOrWhiteSpace(difficulty))
+        {
+            return "Easy";
+        }
+
+        string lowered = difficulty.Trim().ToLowerInvariant();
+        return char.ToUpper(lowered[0]) + lowered.Substring(1);
+    }
+
+    private MonoBehaviour ResolveIntroLoadingAnimationHost()
+    {
+        if (QuizFlowController.Instance != null && QuizFlowController.Instance.isActiveAndEnabled)
+        {
+            return QuizFlowController.Instance;
+        }
+
+        if (introTextLabel != null)
+        {
+            MonoBehaviour[] hosts = introTextLabel.GetComponentsInParent<MonoBehaviour>(true);
+            for (int i = 0; i < hosts.Length; i++)
+            {
+                MonoBehaviour host = hosts[i];
+                if (host != null && host.isActiveAndEnabled)
+                {
+                    return host;
+                }
+            }
+        }
+
+        return isActiveAndEnabled ? this : null;
     }
 
     private void UpdateTopicButtonVisuals()

@@ -58,6 +58,7 @@ public class OllamaGenerateRequestPayload
 {
     public string model;
     public string prompt;
+    public string format;
     public bool stream;
     public string keep_alive;
     public OllamaOptionsPayload options;

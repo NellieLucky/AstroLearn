@@ -8,20 +8,20 @@ using UnityEngine.UI;
 public class ARSceneUIController : MonoBehaviour
 {
     [SerializeField] private string fallbackReturnSceneName = "SolarSystemScene";
-    [SerializeField] private GameObject infoPanel;
+    [SerializeField] private GameObject solarSystemInfoPanel;
+    [SerializeField] private GameObject celestialBodyInfoPanel;
     [SerializeField] private Button infoButton;
-    [SerializeField] private Button closeInfoButton;
     [SerializeField] private Button backButton;
     [SerializeField] private GameObject instructionTextObject;
     [SerializeField] private TMP_Text instructionTextTmp;
     [SerializeField] private Text instructionTextLegacy;
-    [SerializeField] private TMP_Text titleTextTmp;
-    [SerializeField] private Text titleTextLegacy;
-    [SerializeField] private TMP_Text infoTextTmp;
-    [SerializeField] private Text infoTextLegacy;
+    [SerializeField] private string titleTextObjectName = "TitleText";
+    [SerializeField] private string subtitleTextObjectName = "Subtitle";
+    [SerializeField] private string infoTextObjectName = "InfoText";
 
     private readonly Dictionary<string, GameObject> specificImageTargets = new Dictionary<string, GameObject>(StringComparer.OrdinalIgnoreCase);
     private readonly List<GameObject> genericImageTargets = new List<GameObject>();
+    private readonly List<Button> closeInfoButtons = new List<Button>();
     private bool launchContextInitialized;
     private bool useSpecificSelectedBody;
     private string selectedBodyName;
@@ -81,10 +81,16 @@ public class ARSceneUIController : MonoBehaviour
             infoButton.onClick.AddListener(ShowInfoPanel);
         }
 
-        if (closeInfoButton != null)
+        for (int i = 0; i < closeInfoButtons.Count; i++)
         {
-            closeInfoButton.onClick.RemoveListener(HideInfoPanel);
-            closeInfoButton.onClick.AddListener(HideInfoPanel);
+            Button closeButton = closeInfoButtons[i];
+            if (closeButton == null)
+            {
+                continue;
+            }
+
+            closeButton.onClick.RemoveListener(HideInfoPanel);
+            closeButton.onClick.AddListener(HideInfoPanel);
         }
 
         if (backButton != null)
@@ -101,9 +107,13 @@ public class ARSceneUIController : MonoBehaviour
             infoButton.onClick.RemoveListener(ShowInfoPanel);
         }
 
-        if (closeInfoButton != null)
+        for (int i = 0; i < closeInfoButtons.Count; i++)
         {
-            closeInfoButton.onClick.RemoveListener(HideInfoPanel);
+            Button closeButton = closeInfoButtons[i];
+            if (closeButton != null)
+            {
+                closeButton.onClick.RemoveListener(HideInfoPanel);
+            }
         }
 
         if (backButton != null)
@@ -114,18 +124,23 @@ public class ARSceneUIController : MonoBehaviour
 
     public void ShowInfoPanel()
     {
-        if (infoPanel != null)
+        if (activeTrackedBodyName == null)
         {
-            infoPanel.SetActive(true);
+            return;
         }
+
+        if (!useSpecificSelectedBody && string.IsNullOrWhiteSpace(activeTrackedBodyName))
+        {
+            ShowSolarSystemInfoPanel();
+            return;
+        }
+
+        ShowCelestialBodyInfoPanel();
     }
 
     public void HideInfoPanel()
     {
-        if (infoPanel != null)
-        {
-            infoPanel.SetActive(false);
-        }
+        HideAllInfoPanels();
     }
 
     public void ReturnFromAr()
@@ -164,7 +179,7 @@ public class ARSceneUIController : MonoBehaviour
         AutoAssignReferences();
         CacheSceneTargets();
         InitializeLaunchContextIfNeeded();
-        HideInfoPanel();
+        HideAllInfoPanels();
         ShowInstructionText();
     }
 
@@ -175,18 +190,21 @@ public class ARSceneUIController : MonoBehaviour
 
         if (useSpecificSelectedBody)
         {
-            ApplyBodyTexts(selectedBodyTitle, selectedBodyDescription);
+            ApplyBodyTexts(selectedBodyTitle, selectedBodyName, selectedBodyDescription);
+            ShowCelestialBodyInfoPanel();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(normalizedBodyName))
         {
             ApplyGenericTexts();
+            ShowSolarSystemInfoPanel();
             return;
         }
 
         string displayName = ARBodySelectionContext.FormatDisplayName(normalizedBodyName);
-        ApplyBodyTexts(displayName, GetFallbackDescription(displayName));
+        ApplyBodyTexts(displayName, normalizedBodyName, GetFallbackDescription(normalizedBodyName));
+        ShowCelestialBodyInfoPanel();
     }
 
     public void HandleTrackedBodyLost(string bodyName)
@@ -199,10 +217,11 @@ public class ARSceneUIController : MonoBehaviour
         }
 
         activeTrackedBodyName = null;
+        HideAllInfoPanels();
 
         if (useSpecificSelectedBody)
         {
-            ApplyBodyTexts(selectedBodyTitle, selectedBodyDescription);
+            ApplyBodyTexts(selectedBodyTitle, selectedBodyName, selectedBodyDescription);
             string instruction = string.IsNullOrWhiteSpace(selectedBodyTitle)
                 ? "Point your camera at the marker"
                 : $"Point your camera at the {selectedBodyTitle} marker";
@@ -218,12 +237,30 @@ public class ARSceneUIController : MonoBehaviour
     {
         Transform canvasRoot = transform;
 
-        if (infoPanel == null)
+        if (solarSystemInfoPanel == null)
         {
-            Transform panel = FindChildRecursive(canvasRoot, "InfoPanel");
+            Transform panel = FindChildRecursive(canvasRoot, "SolarSystemInfoPanel");
             if (panel != null)
             {
-                infoPanel = panel.gameObject;
+                solarSystemInfoPanel = panel.gameObject;
+            }
+        }
+
+        if (solarSystemInfoPanel == null)
+        {
+            Transform legacyPanel = FindChildRecursive(canvasRoot, "InfoPanel");
+            if (legacyPanel != null)
+            {
+                solarSystemInfoPanel = legacyPanel.gameObject;
+            }
+        }
+
+        if (celestialBodyInfoPanel == null)
+        {
+            Transform panel = FindChildRecursive(canvasRoot, "CelestialBodyInfoPanel");
+            if (panel != null)
+            {
+                celestialBodyInfoPanel = panel.gameObject;
             }
         }
 
@@ -233,15 +270,6 @@ public class ARSceneUIController : MonoBehaviour
             if (buttonObject != null)
             {
                 infoButton = buttonObject.GetComponent<Button>();
-            }
-        }
-
-        if (closeInfoButton == null)
-        {
-            Transform buttonObject = FindChildRecursive(canvasRoot, "CloseInfoButton");
-            if (buttonObject != null)
-            {
-                closeInfoButton = buttonObject.GetComponent<Button>();
             }
         }
 
@@ -274,43 +302,8 @@ public class ARSceneUIController : MonoBehaviour
             instructionTextLegacy = instructionTextObject.GetComponent<Text>();
         }
 
-        if (titleTextTmp == null)
-        {
-            Transform title = FindChildRecursive(canvasRoot, "TitleText");
-            if (title != null)
-            {
-                titleTextTmp = title.GetComponent<TMP_Text>();
-                titleTextLegacy = titleTextLegacy == null ? title.GetComponent<Text>() : titleTextLegacy;
-            }
-        }
-
-        if (titleTextLegacy == null)
-        {
-            Transform title = FindChildRecursive(canvasRoot, "TitleText");
-            if (title != null)
-            {
-                titleTextLegacy = title.GetComponent<Text>();
-            }
-        }
-
-        if (infoTextTmp == null)
-        {
-            Transform info = FindChildRecursive(canvasRoot, "InfoText");
-            if (info != null)
-            {
-                infoTextTmp = info.GetComponent<TMP_Text>();
-                infoTextLegacy = infoTextLegacy == null ? info.GetComponent<Text>() : infoTextLegacy;
-            }
-        }
-
-        if (infoTextLegacy == null)
-        {
-            Transform info = FindChildRecursive(canvasRoot, "InfoText");
-            if (info != null)
-            {
-                infoTextLegacy = info.GetComponent<Text>();
-            }
-        }
+        CacheCloseButtons();
+        PreparePanelAutoSizing();
     }
 
     private static Transform FindChildRecursive(Transform parent, string targetName)
@@ -397,7 +390,7 @@ public class ARSceneUIController : MonoBehaviour
                 : selection.Description;
 
             SetTargetVisibility(selectedBodyName);
-            ApplyBodyTexts(selectedBodyTitle, selectedBodyDescription);
+            ApplyBodyTexts(selectedBodyTitle, selectedBodyName, selectedBodyDescription);
             SetInstructionText($"Point your camera at the {selectedBodyTitle} marker");
             return;
         }
@@ -446,13 +439,16 @@ public class ARSceneUIController : MonoBehaviour
 
     private void ApplyGenericTexts()
     {
-        ApplyBodyTexts(GenericTitle, GenericInfo);
+        SetPanelTexts(solarSystemInfoPanel, GenericTitle, string.Empty, GenericInfo);
     }
 
-    private void ApplyBodyTexts(string title, string description)
+    private void ApplyBodyTexts(string title, string bodyName, string description)
     {
-        SetTitleText(string.IsNullOrWhiteSpace(title) ? GenericTitle : title);
-        SetInfoText(string.IsNullOrWhiteSpace(description) ? GenericInfo : description);
+        SetPanelTexts(
+            celestialBodyInfoPanel,
+            string.IsNullOrWhiteSpace(title) ? GenericTitle : title,
+            GetBodySubtitle(bodyName),
+            string.IsNullOrWhiteSpace(description) ? GenericInfo : description);
     }
 
     private void SetInstructionText(string value)
@@ -468,30 +464,141 @@ public class ARSceneUIController : MonoBehaviour
         }
     }
 
-    private void SetTitleText(string value)
+    private void SetPanelTexts(GameObject panelRoot, string titleValue, string subtitleValue, string infoValue)
     {
-        if (titleTextTmp != null)
-        {
-            titleTextTmp.text = value;
-        }
+        SetNamedText(panelRoot, titleTextObjectName, titleValue);
+        SetNamedText(panelRoot, subtitleTextObjectName, subtitleValue);
+        SetNamedText(panelRoot, infoTextObjectName, infoValue);
 
-        if (titleTextLegacy != null)
+        ARInfoPanelAutoSizer autoSizer = EnsurePanelAutoSizer(panelRoot);
+        if (autoSizer != null)
         {
-            titleTextLegacy.text = value;
+            autoSizer.QueueRefresh();
         }
     }
 
-    private void SetInfoText(string value)
+    private void SetNamedText(GameObject panelRoot, string objectName, string value)
     {
-        if (infoTextTmp != null)
+        if (panelRoot == null || string.IsNullOrWhiteSpace(objectName))
         {
-            infoTextTmp.text = value;
+            return;
         }
 
-        if (infoTextLegacy != null)
+        Transform[] transforms = panelRoot.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < transforms.Length; i++)
         {
-            infoTextLegacy.text = value;
+            Transform child = transforms[i];
+            if (child == null || child.name != objectName)
+            {
+                continue;
+            }
+
+            TMP_Text tmpText = child.GetComponent<TMP_Text>();
+            if (tmpText != null)
+            {
+                tmpText.text = value;
+            }
+
+            Text legacyText = child.GetComponent<Text>();
+            if (legacyText != null)
+            {
+                legacyText.text = value;
+            }
         }
+    }
+
+    private void CacheCloseButtons()
+    {
+        closeInfoButtons.Clear();
+        CollectCloseButtonsFromPanel(solarSystemInfoPanel);
+        CollectCloseButtonsFromPanel(celestialBodyInfoPanel);
+    }
+
+    private void CollectCloseButtonsFromPanel(GameObject panelRoot)
+    {
+        if (panelRoot == null)
+        {
+            return;
+        }
+
+        Transform[] transforms = panelRoot.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            Transform child = transforms[i];
+            if (child == null || child.name != "CloseInfoButton")
+            {
+                continue;
+            }
+
+            Button button = child.GetComponent<Button>();
+            if (button != null && !closeInfoButtons.Contains(button))
+            {
+                closeInfoButtons.Add(button);
+            }
+        }
+    }
+
+    private void ShowSolarSystemInfoPanel()
+    {
+        if (solarSystemInfoPanel != null)
+        {
+            solarSystemInfoPanel.SetActive(true);
+        }
+
+        if (celestialBodyInfoPanel != null)
+        {
+            celestialBodyInfoPanel.SetActive(false);
+        }
+    }
+
+    private void ShowCelestialBodyInfoPanel()
+    {
+        if (celestialBodyInfoPanel != null)
+        {
+            celestialBodyInfoPanel.SetActive(true);
+        }
+
+        if (solarSystemInfoPanel != null)
+        {
+            solarSystemInfoPanel.SetActive(false);
+        }
+    }
+
+    private void HideAllInfoPanels()
+    {
+        if (solarSystemInfoPanel != null)
+        {
+            solarSystemInfoPanel.SetActive(false);
+        }
+
+        if (celestialBodyInfoPanel != null)
+        {
+            celestialBodyInfoPanel.SetActive(false);
+        }
+    }
+
+    private void PreparePanelAutoSizing()
+    {
+        EnsurePanelAutoSizer(solarSystemInfoPanel);
+        EnsurePanelAutoSizer(celestialBodyInfoPanel);
+    }
+
+    private ARInfoPanelAutoSizer EnsurePanelAutoSizer(GameObject panelRoot)
+    {
+        if (panelRoot == null)
+        {
+            return null;
+        }
+
+        ARInfoPanelAutoSizer autoSizer = panelRoot.GetComponent<ARInfoPanelAutoSizer>();
+        if (autoSizer == null)
+        {
+            autoSizer = panelRoot.AddComponent<ARInfoPanelAutoSizer>();
+        }
+
+        bool preserveTopEdge = panelRoot == celestialBodyInfoPanel;
+        autoSizer.Configure(preserveTopEdge);
+        return autoSizer;
     }
 
     private static string ResolveBodyNameFromTargetName(string targetName)
@@ -550,6 +657,35 @@ public class ARSceneUIController : MonoBehaviour
                 return "Neptune is a distant ice giant with strong winds, deep blue color, and an orbit far from the Sun.";
             default:
                 return GenericInfo;
+        }
+    }
+
+    private static string GetBodySubtitle(string bodyName)
+    {
+        switch (ARBodySelectionContext.NormalizeBodyKey(bodyName))
+        {
+            case "sun":
+                return "The Star of Our Solar System";
+            case "mercury":
+                return "The Swiftest Planet";
+            case "venus":
+                return "The Hottest Planet";
+            case "earth":
+                return "Our Home Planet";
+            case "moon":
+                return "Earth's Natural Satellite";
+            case "mars":
+                return "The Red Planet";
+            case "jupiter":
+                return "The Largest Planet";
+            case "saturn":
+                return "The Ringed Giant";
+            case "uranus":
+                return "The Tilted Ice Giant";
+            case "neptune":
+                return "The Windy Ice Giant";
+            default:
+                return string.Empty;
         }
     }
 }

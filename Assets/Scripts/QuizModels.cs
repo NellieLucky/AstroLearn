@@ -46,6 +46,21 @@ public class QuizHistoryCollection
 }
 
 [Serializable]
+public class QuizTemplateCacheEntry
+{
+    public string topic;
+    public string difficulty;
+    public string cachedAtUtc;
+    public List<QuizQuestionData> questions = new List<QuizQuestionData>();
+}
+
+[Serializable]
+public class QuizTemplateCacheCollection
+{
+    public List<QuizTemplateCacheEntry> entries = new List<QuizTemplateCacheEntry>();
+}
+
+[Serializable]
 public class QuizGenerationRequest
 {
     public string topic;

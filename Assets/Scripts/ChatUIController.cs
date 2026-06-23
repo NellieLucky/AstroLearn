@@ -25,6 +25,13 @@ public class ChatUIController : MonoBehaviour
     private Button newChatButton;
     private Button clearHistoryButton;
     private Button exitButton;
+    private Button clearConversationButton;
+
+    private GameObject confirmationModal;
+    private TextMeshProUGUI modalMessageText;
+    private Button modalConfirmButton;
+    private Button modalCancelButton;
+    private System.Action onConfirmAction;
 
     private ScrollRect messagesScrollRect;
     private RectTransform messagesContent;
@@ -101,8 +108,33 @@ public class ChatUIController : MonoBehaviour
 
         newChatButton = FindButton(chatbotRoot, "NewChatButton");
         clearHistoryButton = FindButton(chatbotRoot, "ClearHistoryButton");
+        clearConversationButton = FindButton(chatbotRoot, "ClearConversationButton")
+            ?? FindButton(chatbotRoot, "DeleteConversationButton")
+            ?? FindButtonByChildText(chatbotRoot, "Delete this conversation");
         exitButton = FindButton(chatbotRoot, "ExitButton") ?? FindButtonByChildText(chatbotRoot, "EXIT");
         questionInputField = FindInputField(chatbotRoot, "QuestionInputField");
+
+        confirmationModal = FindObjectByNameWithin(chatbotRoot, "ConfirmationModal")
+            ?? FindObjectByNameWithin(chatbotRoot, "Confirmation Modal")
+            ?? FindObjectByNameWithin(chatbotRoot, "DeleteConfirmationModal");
+
+        if (confirmationModal != null)
+        {
+            modalMessageText = FindText(confirmationModal, "ModalMessageText")
+                ?? FindText(confirmationModal, "MessageText")
+                ?? FindText(confirmationModal, "ConfirmText")
+                ?? FindFirstText(confirmationModal);
+
+            modalConfirmButton = FindButton(confirmationModal, "ModalConfirmButton")
+                ?? FindButton(confirmationModal, "ConfirmButton")
+                ?? FindButton(confirmationModal, "YesButton")
+                ?? FindButtonByChildText(confirmationModal, "Yes");
+
+            modalCancelButton = FindButton(confirmationModal, "ModalCancelButton")
+                ?? FindButton(confirmationModal, "CancelButton")
+                ?? FindButton(confirmationModal, "NoButton")
+                ?? FindButtonByChildText(confirmationModal, "No");
+        }
 
         historyItemTemplate = FindObjectByNameWithin(chatbotRoot, "HistoryItemTemplate");
         userMessageTemplate = FindObjectByNameWithin(chatbotRoot, "UserMessageTemplate");
@@ -185,7 +217,9 @@ public class ChatUIController : MonoBehaviour
             historyContent == null ||
             userMessageTemplate == null ||
             botMessageTemplate == null ||
-            historyItemTemplate == null;
+            historyItemTemplate == null ||
+            (clearConversationButton == null && (FindButton(chatbotRoot, "ClearConversationButton") != null || FindButton(chatbotRoot, "DeleteConversationButton") != null || FindButtonByChildText(chatbotRoot, "Delete this conversation") != null)) ||
+            (confirmationModal == null && (FindObjectByNameWithin(chatbotRoot, "ConfirmationModal") != null || FindObjectByNameWithin(chatbotRoot, "Confirmation Modal") != null || FindObjectByNameWithin(chatbotRoot, "DeleteConfirmationModal") != null));
 
         if (!needsResolve)
         {
@@ -205,11 +239,23 @@ public class ChatUIController : MonoBehaviour
         AddListener(newChatButton, HandleNewChatPressed);
         AddListener(clearHistoryButton, HandleClearHistoryPressed);
         AddListener(sendButton, HandleSendPressed);
+        AddListener(clearConversationButton, HandleClearConversationPressed);
+        AddListener(modalConfirmButton, HandleConfirmPressed);
+        AddListener(modalCancelButton, HideConfirmationModal);
 
         if (questionInputField != null)
         {
             questionInputField.onSubmit.RemoveListener(HandleInputSubmit);
             questionInputField.onSubmit.AddListener(HandleInputSubmit);
+
+            questionInputField.onSelect.RemoveListener(HandleInputSelect);
+            questionInputField.onSelect.AddListener(HandleInputSelect);
+
+            questionInputField.onDeselect.RemoveListener(HandleInputDeselect);
+            questionInputField.onDeselect.AddListener(HandleInputDeselect);
+
+            questionInputField.onValueChanged.RemoveListener(HandleInputValueChanged);
+            questionInputField.onValueChanged.AddListener(HandleInputValueChanged);
         }
     }
 
@@ -218,10 +264,16 @@ public class ChatUIController : MonoBehaviour
         RemoveListener(newChatButton, HandleNewChatPressed);
         RemoveListener(clearHistoryButton, HandleClearHistoryPressed);
         RemoveListener(sendButton, HandleSendPressed);
+        RemoveListener(clearConversationButton, HandleClearConversationPressed);
+        RemoveListener(modalConfirmButton, HandleConfirmPressed);
+        RemoveListener(modalCancelButton, HideConfirmationModal);
 
         if (questionInputField != null)
         {
             questionInputField.onSubmit.RemoveListener(HandleInputSubmit);
+            questionInputField.onSelect.RemoveListener(HandleInputSelect);
+            questionInputField.onDeselect.RemoveListener(HandleInputDeselect);
+            questionInputField.onValueChanged.RemoveListener(HandleInputValueChanged);
         }
     }
 
@@ -240,6 +292,11 @@ public class ChatUIController : MonoBehaviour
         if (botMessageTemplate != null)
         {
             botMessageTemplate.SetActive(false);
+        }
+
+        if (confirmationModal != null)
+        {
+            confirmationModal.SetActive(false);
         }
 
         EnsureGreetingPlaceholder();
@@ -404,11 +461,88 @@ public class ChatUIController : MonoBehaviour
 
     private void HandleClearHistoryPressed()
     {
+        ShowConfirmationModal("Are you sure you want to delete all conversations?", ConfirmClearHistory);
+    }
+
+    private void ConfirmClearHistory()
+    {
         sessions = new ChatSessionCollection();
         currentSession = CreateEmptySession("English");
         sessions.activeSessionId = string.Empty;
         GuestChatStorage.ClearSessions();
         RenderAll();
+    }
+
+    private void HandleClearConversationPressed()
+    {
+        ShowConfirmationModal("Are you sure you want to delete this conversation?", ConfirmClearConversation);
+    }
+
+    private void ConfirmClearConversation()
+    {
+        if (currentSession == null || sessions == null || sessions.sessions == null)
+        {
+            return;
+        }
+
+        ChatSessionData toRemove = sessions.sessions.FirstOrDefault(s => s != null && s.sessionId == currentSession.sessionId);
+        if (toRemove != null)
+        {
+            sessions.sessions.Remove(toRemove);
+        }
+
+        currentSession = CreateEmptySession(GetCurrentLanguage());
+        sessions.activeSessionId = currentSession.sessionId;
+        SaveSessions();
+        RenderAll();
+
+        if (questionInputField != null)
+        {
+            questionInputField.text = string.Empty;
+            questionInputField.ActivateInputField();
+        }
+    }
+
+    private void ShowConfirmationModal(string message, System.Action confirmCallback)
+    {
+        if (confirmationModal != null)
+        {
+            if (modalMessageText != null)
+            {
+                modalMessageText.text = message;
+            }
+            onConfirmAction = confirmCallback;
+            confirmationModal.SetActive(true);
+        }
+        else
+        {
+            confirmCallback?.Invoke();
+        }
+    }
+
+    private void HideConfirmationModal()
+    {
+        if (confirmationModal != null)
+        {
+            confirmationModal.SetActive(false);
+        }
+        onConfirmAction = null;
+    }
+
+    private void HandleConfirmPressed()
+    {
+        onConfirmAction?.Invoke();
+        HideConfirmationModal();
+    }
+
+    private bool IsCurrentSessionInHistory()
+    {
+        if (currentSession == null || sessions == null || sessions.sessions == null)
+        {
+            return false;
+        }
+
+        return sessions.sessions.Any(s => s != null && s.sessionId == currentSession.sessionId);
     }
 
     private void HandleSendPressed()
@@ -472,6 +606,32 @@ public class ChatUIController : MonoBehaviour
         if (!string.IsNullOrWhiteSpace(submittedText))
         {
             HandleSendPressed();
+        }
+    }
+
+    private void HandleInputSelect(string val)
+    {
+        if (questionInputField != null && questionInputField.placeholder != null)
+        {
+            questionInputField.placeholder.gameObject.SetActive(false);
+        }
+    }
+
+    private void HandleInputDeselect(string val)
+    {
+        if (questionInputField != null && questionInputField.placeholder != null)
+        {
+            bool shouldShow = string.IsNullOrEmpty(questionInputField.text);
+            questionInputField.placeholder.gameObject.SetActive(shouldShow);
+        }
+    }
+
+    private void HandleInputValueChanged(string text)
+    {
+        if (questionInputField != null && questionInputField.placeholder != null)
+        {
+            bool shouldShow = string.IsNullOrEmpty(text) && !questionInputField.isFocused;
+            questionInputField.placeholder.gameObject.SetActive(shouldShow);
         }
     }
 
@@ -1234,6 +1394,14 @@ public class ChatUIController : MonoBehaviour
         if (clearHistoryButton != null)
         {
             clearHistoryButton.interactable = !isWaitingForReply;
+            bool hasHistory = sessions != null && sessions.sessions != null && sessions.sessions.Count > 0;
+            clearHistoryButton.gameObject.SetActive(hasHistory);
+        }
+
+        if (clearConversationButton != null)
+        {
+            clearConversationButton.interactable = !isWaitingForReply;
+            clearConversationButton.gameObject.SetActive(IsCurrentSessionInHistory());
         }
     }
 

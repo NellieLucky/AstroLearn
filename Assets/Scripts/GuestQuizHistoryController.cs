@@ -159,12 +159,18 @@ public class GuestQuizHistoryController : MonoBehaviour
         }
 
         TextMeshProUGUI topicText = FindText(card, "TopicName");
+        TextMeshProUGUI difficultyText = FindText(card, "Difficulty") ?? FindText(card, "DifficultyText");
         TextMeshProUGUI scoreText = FindText(card, "QuizScore");
         TextMeshProUGUI dateText = FindText(card, "DateTaken");
 
         if (topicText != null)
         {
             topicText.text = FormatTopic(entry.topic);
+        }
+
+        if (difficultyText != null)
+        {
+            difficultyText.text = FormatDifficulty(entry.difficulty);
         }
 
         if (scoreText != null)
@@ -326,6 +332,17 @@ public class GuestQuizHistoryController : MonoBehaviour
         }
 
         return parsed.ToLocalTime().ToString("MMMM dd, yyyy h:mm tt");
+    }
+
+    private static string FormatDifficulty(string difficulty)
+    {
+        if (string.IsNullOrWhiteSpace(difficulty))
+        {
+            return "Easy";
+        }
+
+        string lowered = difficulty.Trim().ToLowerInvariant();
+        return char.ToUpper(lowered[0]) + lowered.Substring(1);
     }
 
     private static void HandleHistoryCardSelected(QuizHistoryEntry entry)

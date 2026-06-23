@@ -12,8 +12,8 @@ public class QuizFlowController : MonoBehaviour
 {
     private const int DefaultQuestionCount = 10;
     private const int LocalGeneratedQuestionCount = 4;
-    private const int OllamaQuizTimeoutSeconds = 40;
-    private const int OllamaQuizMaxTokens = 650;
+    private const int OllamaQuizTimeoutSeconds = 0;
+    private const int OllamaQuizMaxTokens = 480;
 
     public static QuizFlowController Instance { get; private set; }
 
@@ -54,6 +54,25 @@ public class QuizFlowController : MonoBehaviour
     private RectTransform breakdownTemplateCard;
     private Scrollbar breakdownVerticalScrollbar;
     private readonly List<GameObject> generatedBreakdownCards = new List<GameObject>();
+
+    private ScrollRect resultBreakdownScrollRect;
+    private RectTransform resultBreakdownContent;
+    private RectTransform resultBreakdownTemplateCard;
+    private Scrollbar resultBreakdownVerticalScrollbar;
+    private readonly List<GameObject> generatedResultBreakdownCards = new List<GameObject>();
+
+    private sealed class TopicFactProfile
+    {
+        public string Key;
+        public string DisplayName;
+        public string TypeLabel;
+        public string RelationFact;
+        public string FeatureFact;
+        public string AtmosphereFact;
+        public string SystemFact;
+        public string DistinctionFact;
+        public string[] Keywords;
+    }
 
     private QuizSessionData currentSession;
     private int breakdownQuestionIndex;
@@ -179,16 +198,17 @@ public class QuizFlowController : MonoBehaviour
             "OLLAMA_QUIZ_MODEL",
             EnvFileLoader.Get("OLLAMA_CHAT_MODEL", "llama3.2:3b"));
 
-        if (!string.IsNullOrWhiteSpace(endpoint))
+        bool canUseLocalQuizModel = !string.IsNullOrWhiteSpace(ollamaEndpoint) && !string.IsNullOrWhiteSpace(ollamaModel);
+        if (canUseLocalQuizModel)
         {
-            yield return StartCoroutine(RequestQuizFromEndpoint(endpoint.Trim(), bearerToken, anonKey, topic, difficulty, result => session = result));
+            Debug.Log("[QuizFlowController] Trying local Ollama quiz generation first.");
+            yield return StartCoroutine(RequestQuizFromOllama(ollamaEndpoint.Trim(), ollamaModel.Trim(), topic, difficulty, result => session = result));
         }
 
-        bool canUseLocalQuizModel = !string.IsNullOrWhiteSpace(ollamaEndpoint) && !string.IsNullOrWhiteSpace(ollamaModel);
-        if (session == null && canUseLocalQuizModel)
+        if (session == null && !string.IsNullOrWhiteSpace(endpoint))
         {
-            Debug.Log("[QuizFlowController] Gemini unavailable. Trying local Ollama quiz generation.");
-            yield return StartCoroutine(RequestQuizFromOllama(ollamaEndpoint.Trim(), ollamaModel.Trim(), topic, difficulty, result => session = result));
+            Debug.Log("[QuizFlowController] Ollama quiz generation unavailable. Trying Gemini endpoint.");
+            yield return StartCoroutine(RequestQuizFromEndpoint(endpoint.Trim(), bearerToken, anonKey, topic, difficulty, result => session = result));
         }
 
         if (session == null)
@@ -248,6 +268,7 @@ public class QuizFlowController : MonoBehaviour
 
             string responseJson = request.downloadHandler.text;
             QuizSessionData parsedSession = ParseQuizSession(responseJson, topic, difficulty);
+            parsedSession = SanitizeGeneratedSession(parsedSession, topic, difficulty);
             if (!ValidateSession(parsedSession))
             {
                 Debug.LogWarning("[QuizFlowController] Gemini quiz response was invalid. Falling back to local quiz.");
@@ -269,12 +290,13 @@ public class QuizFlowController : MonoBehaviour
         {
             model = model,
             prompt = prompt,
+            format = "json",
             stream = false,
             keep_alive = "30m",
             options = new OllamaOptionsPayload
             {
                 num_predict = OllamaQuizMaxTokens,
-                temperature = 0.35f
+                temperature = 0.2f
             }
         };
 
@@ -324,7 +346,8 @@ public class QuizFlowController : MonoBehaviour
 
             string normalizedJson = NormalizeOllamaQuizJson(response != null ? response.response : null);
             QuizSessionData parsedSession = ParseQuizSession(normalizedJson, topic, difficulty);
-            if (!ValidateSession(parsedSession, LocalGeneratedQuestionCount, DefaultQuestionCount))
+            parsedSession = SanitizeGeneratedSession(parsedSession, topic, difficulty);
+            if (!ValidateSession(parsedSession, 1, DefaultQuestionCount))
             {
                 Debug.LogWarning("[QuizFlowController] Ollama quiz response was invalid. Falling back to built-in quiz.");
                 onResult?.Invoke(null);
@@ -525,6 +548,8 @@ public class QuizFlowController : MonoBehaviour
         {
             resultTitleText.text = $"{currentSession.topic.ToUpper()} {currentSession.difficulty.ToUpper()} QUIZ";
         }
+
+        RenderResultBreakdownCards();
     }
 
     private void RenderBreakdownPage()
@@ -813,6 +838,24 @@ public class QuizFlowController : MonoBehaviour
         resultRestartButton = FindButtonByChildText(quizResultPage, "RESTART QUIZ");
         resultReviewButton = FindButtonByChildText(quizResultPage, "PLAY QUIZ") ?? FindButtonByChildText(quizResultPage, "REVIEW ANSWERS");
 
+        resultBreakdownScrollRect = FindComponentInChildrenByName<ScrollRect>(quizResultPage, "BreakdownScrollView")
+            ?? (quizResultPage != null ? quizResultPage.GetComponentInChildren<ScrollRect>(true) : null);
+        resultBreakdownContent = resultBreakdownScrollRect != null ? resultBreakdownScrollRect.content : null;
+        resultBreakdownVerticalScrollbar = resultBreakdownScrollRect != null
+            ? FindComponentInChildrenByName<Scrollbar>(resultBreakdownScrollRect.gameObject, "Scrollbar Vertical")
+            : null;
+        resultBreakdownTemplateCard = resultBreakdownContent != null
+            ? FindComponentInChildrenByName<RectTransform>(resultBreakdownContent.gameObject, "QuestionCard")
+            : null;
+
+        if (resultBreakdownTemplateCard == null)
+        {
+            resultBreakdownTemplateCard = FindRectTransform(quizResultPage, "QuestionCard", "Question")
+                ?? FindRectTransform(quizResultPage, "QuestionCard", "QuestionText")
+                ?? FindRectTransform(quizResultPage, "Content", "Question")
+                ?? FindRectTransform(quizResultPage, "Content", "QuestionText");
+        }
+
         breakdownTitleText = FindText(quizBreakdownPage, "TitleText");
         breakdownProgressText = FindText(quizBreakdownPage, "CorrectText");
         breakdownScoreValueText = FindText(quizBreakdownPage, "ScoreValueText");
@@ -877,6 +920,167 @@ public class QuizFlowController : MonoBehaviour
         }
 
         ShowResultPage();
+    }
+
+    private void RenderResultBreakdownCards()
+    {
+        if (resultBreakdownTemplateCard == null || resultBreakdownContent == null || currentSession == null || currentSession.questions == null)
+        {
+            return;
+        }
+
+        EnsureResultBreakdownContentLayout();
+        ClearGeneratedResultBreakdownCards();
+
+        resultBreakdownTemplateCard.gameObject.SetActive(false);
+
+        for (int i = 0; i < currentSession.questions.Count; i++)
+        {
+            RectTransform card = Instantiate(resultBreakdownTemplateCard, resultBreakdownContent);
+            card.name = "ResultBreakdownCard_" + i;
+            PrepareResultBreakdownCardForReuse(card);
+            generatedResultBreakdownCards.Add(card.gameObject);
+
+            BindBreakdownCard(card.gameObject, currentSession.questions[i], GetSelectedAnswer(i), i);
+        }
+
+        ResizeResultBreakdownContent(currentSession.questions.Count);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(resultBreakdownContent);
+        Canvas.ForceUpdateCanvases();
+
+        if (resultBreakdownScrollRect != null)
+        {
+            resultBreakdownScrollRect.normalizedPosition = new Vector2(0f, 1f);
+        }
+    }
+
+    private void EnsureResultBreakdownContentLayout()
+    {
+        if (resultBreakdownContent == null)
+        {
+            return;
+        }
+
+        if (resultBreakdownScrollRect != null)
+        {
+            resultBreakdownScrollRect.horizontal = false;
+            resultBreakdownScrollRect.vertical = true;
+            resultBreakdownScrollRect.movementType = ScrollRect.MovementType.Clamped;
+
+            if (resultBreakdownVerticalScrollbar != null)
+            {
+                resultBreakdownVerticalScrollbar.gameObject.SetActive(true);
+                resultBreakdownScrollRect.verticalScrollbar = resultBreakdownVerticalScrollbar;
+                resultBreakdownScrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+            }
+        }
+
+        VerticalLayoutGroup layout = resultBreakdownContent.GetComponent<VerticalLayoutGroup>();
+        if (layout != null)
+        {
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.spacing = Mathf.Max(layout.spacing, 20f);
+        }
+
+        ContentSizeFitter fitter = resultBreakdownContent.GetComponent<ContentSizeFitter>();
+        if (fitter == null)
+        {
+            fitter = resultBreakdownContent.gameObject.AddComponent<ContentSizeFitter>();
+        }
+
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+    }
+
+    private void PrepareResultBreakdownCardForReuse(RectTransform card)
+    {
+        if (card == null)
+        {
+            return;
+        }
+
+        card.SetParent(resultBreakdownContent, false);
+        card.gameObject.SetActive(true);
+        card.anchorMin = new Vector2(0f, 1f);
+        card.anchorMax = new Vector2(1f, 1f);
+        card.pivot = new Vector2(0.5f, 1f);
+        card.localScale = Vector3.one;
+        card.anchoredPosition = Vector2.zero;
+
+        LayoutElement layoutElement = card.GetComponent<LayoutElement>();
+        if (layoutElement == null)
+        {
+            layoutElement = card.gameObject.AddComponent<LayoutElement>();
+        }
+
+        float preferredHeight = card.sizeDelta.y > 0f ? card.sizeDelta.y : card.rect.height;
+        if (preferredHeight <= 0f)
+        {
+            preferredHeight = 760f;
+        }
+
+        layoutElement.ignoreLayout = false;
+        layoutElement.preferredWidth = -1f;
+        layoutElement.minWidth = -1f;
+        layoutElement.preferredHeight = preferredHeight;
+        layoutElement.minHeight = preferredHeight;
+        layoutElement.flexibleHeight = 0f;
+
+        ContentSizeFitter fitter = card.GetComponent<ContentSizeFitter>();
+        if (fitter != null)
+        {
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.enabled = false;
+        }
+    }
+
+    private void ClearGeneratedResultBreakdownCards()
+    {
+        for (int i = 0; i < generatedResultBreakdownCards.Count; i++)
+        {
+            if (generatedResultBreakdownCards[i] != null)
+            {
+                Destroy(generatedResultBreakdownCards[i]);
+            }
+        }
+
+        generatedResultBreakdownCards.Clear();
+    }
+
+    private void ResizeResultBreakdownContent(int cardCount)
+    {
+        if (resultBreakdownContent == null || resultBreakdownTemplateCard == null)
+        {
+            return;
+        }
+
+        EnsureResultBreakdownContentLayout();
+
+        float spacing = GetResultBreakdownCardSpacing();
+        float cardHeight = resultBreakdownTemplateCard.sizeDelta.y > 0f ? resultBreakdownTemplateCard.sizeDelta.y : resultBreakdownTemplateCard.rect.height;
+        if (cardHeight <= 0f)
+        {
+            cardHeight = 760f;
+        }
+
+        VerticalLayoutGroup layout = resultBreakdownContent.GetComponent<VerticalLayoutGroup>();
+        float paddingTop = layout != null ? layout.padding.top : 0f;
+        float paddingBottom = layout != null ? layout.padding.bottom : 0f;
+        float totalHeight = paddingTop + paddingBottom + (cardHeight * Mathf.Max(1, cardCount)) + (spacing * Mathf.Max(0, cardCount - 1));
+
+        Vector2 sizeDelta = resultBreakdownContent.sizeDelta;
+        sizeDelta.y = totalHeight;
+        resultBreakdownContent.sizeDelta = sizeDelta;
+    }
+
+    private float GetResultBreakdownCardSpacing()
+    {
+        VerticalLayoutGroup layout = resultBreakdownContent != null ? resultBreakdownContent.GetComponent<VerticalLayoutGroup>() : null;
+        return layout != null ? layout.spacing : 20f;
     }
 
     private void RenderBreakdownCards()
@@ -1523,12 +1727,43 @@ public class QuizFlowController : MonoBehaviour
 
         Shuffle(fallbackPool);
 
+        int originalQuestionCount = session.questions.Count;
+
         while (session.questions.Count < DefaultQuestionCount && fallbackPool.Count > 0)
         {
             QuizQuestionData question = fallbackPool[0];
             fallbackPool.RemoveAt(0);
             session.questions.Add(question);
             usedKeys.Add(NormalizeQuestionKey(question.question));
+        }
+
+        if (session.questions.Count < DefaultQuestionCount)
+        {
+            List<QuizQuestionData> reusePool = BuildFallbackQuestionPool(session.topic, session.difficulty)
+                .Where(question => question != null && !session.questions.Any(existing => existing != null && string.Equals(NormalizeQuestionKey(existing.question), NormalizeQuestionKey(question.question), StringComparison.Ordinal)))
+                .Select(CloneQuestion)
+                .ToList();
+
+            Shuffle(reusePool);
+
+            while (session.questions.Count < DefaultQuestionCount && reusePool.Count > 0)
+            {
+                QuizQuestionData question = reusePool[0];
+                reusePool.RemoveAt(0);
+                session.questions.Add(question);
+                usedKeys.Add(NormalizeQuestionKey(question.question));
+            }
+        }
+
+        int addedQuestionCount = session.questions.Count - originalQuestionCount;
+        if (addedQuestionCount > 0)
+        {
+            Debug.Log("[QuizFlowController] Added " + addedQuestionCount + " fallback question(s) for " + session.topic + " " + session.difficulty + " quiz.");
+        }
+
+        if (session.questions.Count < DefaultQuestionCount)
+        {
+            Debug.LogWarning("[QuizFlowController] Quiz still has only " + session.questions.Count + " question(s) after fallback top-up for " + session.topic + " " + session.difficulty + ".");
         }
 
         session.selectedAnswers = Enumerable.Repeat(string.Empty, session.questions.Count).ToList();
@@ -1577,6 +1812,7 @@ public class QuizFlowController : MonoBehaviour
     {
         string resolvedTopic = ResolveTopicDisplayName(topic);
         string resolvedDifficulty = string.Equals(difficulty, "Hard", StringComparison.OrdinalIgnoreCase) ? "Hard" : "Easy";
+        TopicFactProfile profile = GetTopicFactProfile(resolvedTopic);
 
         StringBuilder builder = new StringBuilder();
         builder.AppendLine("You are generating a multiple-choice astronomy quiz for the AstroLearn Unity app.");
@@ -1599,11 +1835,15 @@ public class QuizFlowController : MonoBehaviour
         builder.AppendLine($"Topic: {resolvedTopic}");
         builder.AppendLine($"Difficulty: {resolvedDifficulty}");
         builder.AppendLine("All questions must stay within astronomy and the Solar System.");
+        builder.AppendLine($"Every question must directly test knowledge about {resolvedTopic}.");
         builder.AppendLine("Each question must have exactly 4 choices.");
         builder.AppendLine("The correctAnswer must exactly match one of the 4 choices.");
         builder.AppendLine("Avoid duplicate questions.");
         builder.AppendLine("Keep each explanation to one short sentence.");
         builder.AppendLine("Make the questions suitable for Grade 7 to Grade 12 learners.");
+        builder.AppendLine("Do not ask about quizzes, learners, study habits, question difficulty, or how to answer tests.");
+        builder.AppendLine("Do not write filler prompts such as 'Which object is this quiz about?' or 'What does a hard quiz test?'.");
+        builder.AppendLine("Use concrete astronomy facts, recognizable features, and scientifically accurate comparisons.");
         if (string.Equals(resolvedDifficulty, "Easy", StringComparison.OrdinalIgnoreCase))
         {
             builder.AppendLine("Easy questions should focus on direct facts, recognition, and basic understanding.");
@@ -1613,10 +1853,49 @@ public class QuizFlowController : MonoBehaviour
             builder.AppendLine("Hard questions should focus on deeper reasoning, comparison, and inference while still being answerable by students.");
         }
 
+        if (profile != null)
+        {
+            builder.AppendLine("Use these verified AstroLearn facts as source material:");
+            foreach (string fact in BuildPromptFacts(profile))
+            {
+                builder.AppendLine("- " + fact);
+            }
+        }
+
         return builder.ToString();
     }
 
     private static List<QuizQuestionData> BuildEasyFallbackQuestionPool(string topic)
+    {
+        TopicFactProfile profile = GetTopicFactProfile(topic);
+        if (profile == null)
+        {
+            Debug.LogWarning("[QuizFlowController] No topic fact profile found for '" + topic + "'. Using legacy easy fallback questions.");
+            return BuildLegacyEasyFallbackQuestionPool(topic);
+        }
+
+        List<QuizQuestionData> questions = new List<QuizQuestionData>();
+        questions.AddRange(BuildSharedEasyQuestions(profile));
+        questions.AddRange(BuildProfileSpecificEasyQuestions(profile));
+        return DeduplicateQuestions(questions).Take(DefaultQuestionCount).ToList();
+    }
+
+    private static List<QuizQuestionData> BuildHardFallbackQuestionPool(string topic)
+    {
+        TopicFactProfile profile = GetTopicFactProfile(topic);
+        if (profile == null)
+        {
+            Debug.LogWarning("[QuizFlowController] No topic fact profile found for '" + topic + "'. Using legacy hard fallback questions.");
+            return BuildLegacyHardFallbackQuestionPool(topic);
+        }
+
+        List<QuizQuestionData> questions = new List<QuizQuestionData>();
+        questions.AddRange(BuildSharedHardQuestions(profile));
+        questions.AddRange(BuildProfileSpecificHardQuestions(profile));
+        return DeduplicateQuestions(questions).Take(DefaultQuestionCount).ToList();
+    }
+
+    private static List<QuizQuestionData> BuildLegacyEasyFallbackQuestionPool(string topic)
     {
         string answer = ResolveTopicDisplayName(topic);
 
@@ -1639,7 +1918,7 @@ public class QuizFlowController : MonoBehaviour
         };
     }
 
-    private static List<QuizQuestionData> BuildHardFallbackQuestionPool(string topic)
+    private static List<QuizQuestionData> BuildLegacyHardFallbackQuestionPool(string topic)
     {
         string answer = ResolveTopicDisplayName(topic);
 
@@ -1660,6 +1939,682 @@ public class QuizFlowController : MonoBehaviour
             CreateQuestion($"Which approach best improves performance on hard quizzes about {answer}?", "Review concepts, then practice applying them", "Memorize one answer pattern", "Ignore why answers are correct", "Use random guessing each time", "Difficult quizzes reward understanding and application."),
             CreateQuestion($"Why are distractor choices used in hard quizzes about {answer}?", "To test whether learners can evaluate similar-looking options", "To hide the topic completely", "To prevent scoring", "To replace explanations", "Good distractors make learners think carefully about why one answer is strongest."),
         };
+    }
+
+    private static QuizSessionData SanitizeGeneratedSession(QuizSessionData session, string topic, string difficulty)
+    {
+        if (session == null || session.questions == null)
+        {
+            return session;
+        }
+
+        TopicFactProfile profile = GetTopicFactProfile(topic);
+        List<QuizQuestionData> filteredQuestions = new List<QuizQuestionData>();
+        HashSet<string> seenKeys = new HashSet<string>(StringComparer.Ordinal);
+
+        for (int i = 0; i < session.questions.Count; i++)
+        {
+            QuizQuestionData sanitizedQuestion = SanitizeQuestion(session.questions[i]);
+            if (sanitizedQuestion == null)
+            {
+                continue;
+            }
+
+            if (IsMetaQuizQuestion(sanitizedQuestion))
+            {
+                continue;
+            }
+
+            if (profile != null && !IsQuestionSpecificToTopic(sanitizedQuestion, profile))
+            {
+                continue;
+            }
+
+            string key = NormalizeQuestionKey(sanitizedQuestion.question);
+            if (string.IsNullOrWhiteSpace(key) || !seenKeys.Add(key))
+            {
+                continue;
+            }
+
+            filteredQuestions.Add(sanitizedQuestion);
+        }
+
+        if (filteredQuestions.Count != session.questions.Count)
+        {
+            Debug.Log("[QuizFlowController] Removed " + (session.questions.Count - filteredQuestions.Count) + " low-value generated question(s) before using the quiz.");
+        }
+
+        session.questions = filteredQuestions;
+        session.topic = string.IsNullOrWhiteSpace(session.topic) ? ResolveTopicDisplayName(topic) : session.topic.Trim();
+        session.difficulty = string.IsNullOrWhiteSpace(session.difficulty) ? difficulty : session.difficulty.Trim();
+        session.selectedAnswers = Enumerable.Repeat(string.Empty, filteredQuestions.Count).ToList();
+        return session;
+    }
+
+    private static QuizQuestionData SanitizeQuestion(QuizQuestionData question)
+    {
+        if (question == null)
+        {
+            return null;
+        }
+
+        List<string> choices = new List<string>();
+        if (question.choices != null)
+        {
+            for (int i = 0; i < question.choices.Count; i++)
+            {
+                string choice = string.IsNullOrWhiteSpace(question.choices[i]) ? string.Empty : question.choices[i].Trim();
+                if (!string.IsNullOrWhiteSpace(choice))
+                {
+                    choices.Add(choice);
+                }
+            }
+        }
+
+        return new QuizQuestionData
+        {
+            question = string.IsNullOrWhiteSpace(question.question) ? string.Empty : question.question.Trim(),
+            choices = choices,
+            correctAnswer = string.IsNullOrWhiteSpace(question.correctAnswer) ? string.Empty : question.correctAnswer.Trim(),
+            explanation = string.IsNullOrWhiteSpace(question.explanation) ? string.Empty : question.explanation.Trim()
+        };
+    }
+
+    private static bool IsMetaQuizQuestion(QuizQuestionData question)
+    {
+        if (question == null)
+        {
+            return true;
+        }
+
+        string normalized = NormalizeQuestionKey(BuildQuestionSearchText(question));
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return true;
+        }
+
+        string[] bannedPhrases =
+        {
+            "quiz",
+            "quizzes",
+            "multiple choice",
+            "selected topic",
+            "science field",
+            "commonly used to observe",
+            "tool is commonly used",
+            "study strategy",
+            "easy question",
+            "hard question",
+            "easy mode",
+            "hard mode",
+            "foundational understanding",
+            "build confidence",
+            "review concepts",
+            "distractor",
+            "learners",
+            "students",
+            "what does an easy quiz",
+            "what makes a hard quiz",
+            "which skill",
+            "performance on hard quizzes"
+        };
+
+        for (int i = 0; i < bannedPhrases.Length; i++)
+        {
+            if (normalized.Contains(NormalizeQuestionKey(bannedPhrases[i])))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsQuestionSpecificToTopic(QuizQuestionData question, TopicFactProfile profile)
+    {
+        if (question == null || profile == null)
+        {
+            return false;
+        }
+
+        string normalized = NormalizeQuestionKey(BuildQuestionSearchText(question));
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return false;
+        }
+
+        for (int i = 0; i < profile.Keywords.Length; i++)
+        {
+            string keyword = NormalizeQuestionKey(profile.Keywords[i]);
+            if (!string.IsNullOrWhiteSpace(keyword) && normalized.Contains(keyword))
+            {
+                return true;
+            }
+        }
+
+        return normalized.Contains(NormalizeQuestionKey(profile.DisplayName));
+    }
+
+    private static string BuildQuestionSearchText(QuizQuestionData question)
+    {
+        if (question == null)
+        {
+            return string.Empty;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.Append(question.question);
+        builder.Append(' ');
+        builder.Append(question.correctAnswer);
+        builder.Append(' ');
+        builder.Append(question.explanation);
+
+        if (question.choices != null)
+        {
+            for (int i = 0; i < question.choices.Count; i++)
+            {
+                builder.Append(' ');
+                builder.Append(question.choices[i]);
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static IEnumerable<string> BuildPromptFacts(TopicFactProfile profile)
+    {
+        if (profile == null)
+        {
+            yield break;
+        }
+
+        yield return $"{profile.DisplayName} is a {profile.TypeLabel.ToLowerInvariant()}.";
+        yield return $"{profile.DisplayName} is {profile.RelationFact.ToLowerInvariant()}.";
+        yield return $"{profile.DisplayName} is known for {profile.FeatureFact.ToLowerInvariant()}.";
+        yield return $"{profile.DisplayName} has {profile.AtmosphereFact.ToLowerInvariant()}.";
+        yield return $"{profile.DisplayName} also has this system or motion clue: {profile.SystemFact}.";
+        yield return $"{profile.DisplayName} is notable because it {profile.DistinctionFact.ToLowerInvariant()}.";
+    }
+
+    private static List<QuizQuestionData> BuildSharedEasyQuestions(TopicFactProfile profile)
+    {
+        string[] typeDistractors = GetTypeDistractors(profile.TypeLabel);
+        string[] relationDistractors = GetFactDistractors(profile.Key, item => item.RelationFact, "Far beyond Neptune", "Inside a distant galaxy", "Orbiting another star");
+        string[] featureDistractors = GetFactDistractors(profile.Key, item => item.FeatureFact, "A surface made entirely of metal", "A permanent rainbow ocean", "A glowing crystal atmosphere");
+        string[] atmosphereDistractors = GetFactDistractors(profile.Key, item => item.AtmosphereFact, "A shell of solid diamond", "A surface of burning wood", "A vacuum filled with liquid iron");
+        string[] systemDistractors = GetFactDistractors(profile.Key, item => item.SystemFact, "Has continents connected by light bridges", "Never rotates or orbits anything", "Creates its own moons from sunlight");
+        string[] distinctionDistractors = GetFactDistractors(profile.Key, item => item.DistinctionFact, "Exists outside the Solar System", "Never rotates on its axis", "Has no physical structure");
+        string[] bodyDistractors = GetBodyDistractors(profile.Key);
+
+        return new List<QuizQuestionData>
+        {
+            CreateQuestion($"What type of object is {profile.DisplayName}?", profile.TypeLabel, typeDistractors[0], typeDistractors[1], typeDistractors[2], $"{profile.DisplayName} is classified as a {profile.TypeLabel.ToLowerInvariant()}."),
+            CreateQuestion($"Which statement correctly describes {profile.DisplayName}'s place or relationship in the Solar System?", profile.RelationFact, relationDistractors[0], relationDistractors[1], relationDistractors[2], profile.RelationFact + " is the correct relationship clue."),
+            CreateQuestion($"Which feature is most strongly associated with {profile.DisplayName}?", profile.FeatureFact, featureDistractors[0], featureDistractors[1], featureDistractors[2], profile.FeatureFact + " is one of the best-known facts about " + profile.DisplayName + "."),
+            CreateQuestion($"Which statement about {profile.DisplayName}'s atmosphere or composition is correct?", profile.AtmosphereFact, atmosphereDistractors[0], atmosphereDistractors[1], atmosphereDistractors[2], profile.AtmosphereFact + " is the accurate composition clue."),
+            CreateQuestion($"Which statement about {profile.DisplayName}'s system or motion is correct?", profile.SystemFact, systemDistractors[0], systemDistractors[1], systemDistractors[2], profile.SystemFact + " is the correct system or motion detail."),
+            CreateQuestion($"Which fact makes {profile.DisplayName} especially notable?", profile.DistinctionFact, distinctionDistractors[0], distinctionDistractors[1], distinctionDistractors[2], profile.DistinctionFact + " is the standout fact here."),
+            CreateQuestion($"Which object matches this clue: {profile.FeatureFact}?", profile.DisplayName, bodyDistractors[0], bodyDistractors[1], bodyDistractors[2], profile.DisplayName + " is identified by that feature."),
+            CreateQuestion($"Which object fits both of these clues: {profile.RelationFact} and {profile.TypeLabel}?", profile.DisplayName, bodyDistractors[0], bodyDistractors[1], bodyDistractors[2], profile.DisplayName + " matches both clues.")
+        };
+    }
+
+    private static List<QuizQuestionData> BuildProfileSpecificEasyQuestions(TopicFactProfile profile)
+    {
+        switch (profile.Key)
+        {
+            case "sun":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("What process powers the Sun's energy output?", "Nuclear fusion", "Reflection of moonlight", "Burning liquid water", "Collisions with comets", "The Sun releases energy through nuclear fusion in its core."),
+                    CreateQuestion("Why is the Sun so important to Earth?", "It provides most of Earth's light and heat", "It orbits Earth once a day", "It creates tides more strongly than the Moon", "It is the nearest planet", "Sunlight and solar heat are essential for Earth's climate and life.")
+                };
+            case "mercury":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("About how long is one year on Mercury?", "88 Earth days", "24 hours", "365 Earth days", "12 Earth years", "Mercury circles the Sun in about 88 Earth days."),
+                    CreateQuestion("Why does Mercury's temperature change so dramatically?", "It has almost no atmosphere to trap heat", "It is covered by thick oceans", "It produces its own light", "It has giant rings", "Mercury's thin exosphere cannot hold heat well.")
+                };
+            case "venus":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why is Venus hotter than Mercury?", "Its thick carbon dioxide atmosphere traps heat", "It is farther from the Sun", "It spins faster than all other planets", "It has the most moons", "Venus is hottest because its dense atmosphere causes a powerful greenhouse effect."),
+                    CreateQuestion("What kind of clouds cover Venus?", "Sulfuric acid clouds", "Water-vapor rain clouds", "Methane ice clouds", "Ammonia storm clouds", "Venus is wrapped in thick clouds rich in sulfuric acid.")
+                };
+            case "earth":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Which feature most helps Earth support life?", "Stable liquid water", "Bright rings", "Thick methane haze", "A giant red storm", "Liquid water is one of Earth's most important life-supporting features."),
+                    CreateQuestion("How many natural moons does Earth have?", "One", "Two", "Four", "Seventy-nine", "Earth has one natural moon.")
+                };
+            case "moon":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why does the same side of the Moon always face Earth?", "The Moon is tidally locked", "The Moon does not rotate at all", "Earth's atmosphere blocks the other side", "The Sun pulls only one side", "The Moon rotates at the same rate that it orbits Earth."),
+                    CreateQuestion("What natural effect is strongly linked to the Moon's gravity?", "Ocean tides", "Solar flares", "Jupiter's storms", "Saturn's rings", "The Moon's gravity helps drive ocean tides on Earth.")
+                };
+            case "mars":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("What gives Mars its reddish color?", "Iron oxide", "Liquid methane", "Sulfur clouds", "Blue ice", "Iron oxide, or rust, gives Mars its red appearance."),
+                    CreateQuestion("What are Mars's two small moons?", "Phobos and Deimos", "Io and Europa", "Titan and Enceladus", "Triton and Nereid", "Mars has two small moons named Phobos and Deimos.")
+                };
+            case "jupiter":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("What is the Great Red Spot on Jupiter?", "A giant storm", "A solid island", "A frozen crater", "A glowing moon", "The Great Red Spot is a huge storm in Jupiter's atmosphere."),
+                    CreateQuestion("Which group includes Jupiter's largest famous moons?", "Io, Europa, Ganymede, and Callisto", "Titan, Rhea, Dione, and Iapetus", "Phobos, Deimos, Titania, and Ariel", "Triton, Charon, Oberon, and Miranda", "The Galilean moons are Io, Europa, Ganymede, and Callisto.")
+                };
+            case "saturn":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Saturn's rings are made mostly of what?", "Ice and rock particles", "Liquid fire", "Thick glass sheets", "Solid metal plates", "Saturn's rings are mainly icy particles mixed with rock and dust."),
+                    CreateQuestion("Which large moon is especially associated with Saturn?", "Titan", "Europa", "Phobos", "Charon", "Titan is Saturn's largest and most famous moon.")
+                };
+            case "uranus":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("What gas gives Uranus its blue-green color?", "Methane", "Oxygen", "Nitrogen", "Carbon monoxide", "Methane absorbs red light and helps make Uranus look blue-green."),
+                    CreateQuestion("Why are Uranus's seasons so unusual?", "Its axis is tilted strongly on its side", "It is closest to the Sun", "It has no atmosphere", "It spins only once per year", "Uranus is tilted so far that it experiences very unusual seasons.")
+                };
+            case "neptune":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("What is Neptune especially known for?", "Extremely fast winds", "Bright yellow deserts", "Thick ring walls", "Being the hottest planet", "Neptune is famous for its very powerful winds."),
+                    CreateQuestion("What is Neptune's largest moon?", "Triton", "Titan", "Europa", "Deimos", "Triton is Neptune's largest moon.")
+                };
+            default:
+                return new List<QuizQuestionData>();
+        }
+    }
+
+    private static List<QuizQuestionData> BuildSharedHardQuestions(TopicFactProfile profile)
+    {
+        string[] bodyDistractors = GetBodyDistractors(profile.Key);
+        string[] distinctionDistractors = GetFactDistractors(profile.Key, item => item.DistinctionFact, "Never moves in space", "Exists outside the Solar System", "Has no physical structure");
+        string[] featureDistractors = GetFactDistractors(profile.Key, item => item.FeatureFact, "A surface made entirely of metal", "A permanent rainbow ocean", "A glowing crystal atmosphere");
+        string[] atmosphereDistractors = GetFactDistractors(profile.Key, item => item.AtmosphereFact, "A shell of solid diamond", "A surface of burning wood", "A vacuum filled with liquid iron");
+        string[] systemDistractors = GetFactDistractors(profile.Key, item => item.SystemFact, "Has continents connected by light bridges", "Never rotates or orbits anything", "Creates its own moons from sunlight");
+
+        TopicFactProfile firstOther = GetNthOtherProfile(profile.Key, 0);
+        TopicFactProfile secondOther = GetNthOtherProfile(profile.Key, 1);
+        TopicFactProfile thirdOther = GetNthOtherProfile(profile.Key, 2);
+
+        string correctPair = profile.DisplayName + " - " + profile.DistinctionFact;
+        string wrongPairA = firstOther != null ? firstOther.DisplayName + " - " + profile.DistinctionFact : "Venus - " + profile.DistinctionFact;
+        string wrongPairB = secondOther != null ? profile.DisplayName + " - " + secondOther.DistinctionFact : profile.DisplayName + " - Has glowing crystal oceans";
+        string wrongPairC = firstOther != null && thirdOther != null ? thirdOther.DisplayName + " - " + firstOther.FeatureFact : "Mars - Producing light through fusion";
+
+        return new List<QuizQuestionData>
+        {
+            CreateQuestion($"An observer reports an object that is {profile.RelationFact.ToLowerInvariant()} and known for {profile.FeatureFact.ToLowerInvariant()}. Which object is being described?", profile.DisplayName, bodyDistractors[0], bodyDistractors[1], bodyDistractors[2], profile.DisplayName + " matches both clues."),
+            CreateQuestion($"Which object best matches this combination: {profile.AtmosphereFact} and {profile.SystemFact.ToLowerInvariant()}?", profile.DisplayName, bodyDistractors[0], bodyDistractors[1], bodyDistractors[2], profile.DisplayName + " is the object that matches those combined facts."),
+            CreateQuestion("Which pair correctly matches an object and one verified fact?", correctPair, wrongPairA, wrongPairB, wrongPairC, correctPair + " is the only accurate match."),
+            CreateQuestion($"Which statement best distinguishes {profile.DisplayName} from many other Solar System objects?", profile.DistinctionFact, distinctionDistractors[0], distinctionDistractors[1], distinctionDistractors[2], profile.DistinctionFact + " is the strongest distinguishing clue."),
+            CreateQuestion($"Which observation would most strongly suggest an astronomer is studying {profile.DisplayName}?", profile.FeatureFact, featureDistractors[0], featureDistractors[1], featureDistractors[2], profile.FeatureFact + " is the signature observation here."),
+            CreateQuestion($"Which atmosphere or composition clue points most clearly to {profile.DisplayName}?", profile.AtmosphereFact, atmosphereDistractors[0], atmosphereDistractors[1], atmosphereDistractors[2], profile.AtmosphereFact + " is the best composition clue."),
+            CreateQuestion($"Which clue about motion or system best fits {profile.DisplayName}?", profile.SystemFact, systemDistractors[0], systemDistractors[1], systemDistractors[2], profile.SystemFact + " is the accurate system or motion clue."),
+            CreateQuestion($"Which object is most likely being described as a {profile.TypeLabel.ToLowerInvariant()} with this relationship: {profile.RelationFact}?", profile.DisplayName, bodyDistractors[0], bodyDistractors[1], bodyDistractors[2], profile.DisplayName + " fits the type and relationship clues together.")
+        };
+    }
+
+    private static List<QuizQuestionData> BuildProfileSpecificHardQuestions(TopicFactProfile profile)
+    {
+        switch (profile.Key)
+        {
+            case "sun":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why can the Sun emit its own light while planets cannot?", "Fusion in its core produces energy", "It reflects light from Jupiter", "It is made of solid rock", "It has no gravity", "The Sun shines because nuclear fusion releases huge amounts of energy."),
+                    CreateQuestion("Which fact best explains why planets stay in orbit around the Sun?", "The Sun's gravity is strongest in the Solar System", "The Sun spins faster than every planet", "The Moon pulls planets inward", "Planetary rings connect them", "The Sun's gravity is the main force that keeps planets in orbit.")
+                };
+            case "mercury":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why are Mercury's day and night temperatures extremely different?", "Its thin exosphere cannot retain heat well", "It has a thick ocean that evaporates daily", "It is the largest gas giant", "It receives no sunlight", "Mercury has almost no atmosphere to smooth out temperature changes."),
+                    CreateQuestion("Why is a year on Mercury much shorter than a year on Earth?", "Mercury travels in a small, fast orbit close to the Sun", "Mercury rotates backward", "Mercury has two suns", "Mercury is farther from the Sun", "Mercury completes its orbit quickly because it is very close to the Sun.")
+                };
+            case "venus":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why is Venus hotter than Mercury even though Mercury is closer to the Sun?", "Venus's dense atmosphere creates a strong greenhouse effect", "Venus has no atmosphere", "Venus is made of fire", "Venus absorbs heat from Jupiter", "Venus traps heat extremely well because of its thick carbon dioxide atmosphere."),
+                    CreateQuestion("Why is Venus sometimes called Earth's twin but still very hostile?", "It is similar in size to Earth but has crushing pressure and extreme heat", "It has the same oceans as Earth", "It rotates with Earth's moon", "It has life but no land", "Venus is close to Earth in size, but its environment is far more hostile.")
+                };
+            case "earth":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Which combination best explains why Earth can support life?", "Liquid water, moderate temperatures, and a protective atmosphere", "Giant rings, methane clouds, and no moon", "Extreme greenhouse heating and no oceans", "A solid hydrogen surface and constant storms", "Earth's water and protective atmosphere are key reasons it can support life."),
+                    CreateQuestion("Why do Earth and its Moon remain together as a system?", "Earth's gravity keeps the Moon in orbit", "The Sun's rings connect them", "Mars pushes the Moon around Earth", "The Moon has no motion of its own", "The Moon stays near Earth because Earth's gravity keeps it in orbit.")
+                };
+            case "moon":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why do lunar phases change over time?", "We see different sunlit portions as the Moon orbits Earth", "The Moon creates its own changing light", "Earth's shadow covers the Moon every night", "The Sun moves around the Moon", "Lunar phases change because the Moon's sunlit half is viewed from different angles."),
+                    CreateQuestion("Why does the Moon keep so many visible craters compared with Earth?", "It lacks a thick atmosphere, liquid water, and active weather that erase impacts", "It is closer to Jupiter", "It is made of gas", "It receives no sunlight", "The Moon preserves craters because little erosion happens there.")
+                };
+            case "mars":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why do scientists see Mars as an important place to study past habitability?", "Evidence suggests ancient water once existed there", "Mars is hotter than the Sun", "Mars has thick oceans today", "Mars is the only planet with gravity", "Signs of ancient water make Mars important in the search for past habitability."),
+                    CreateQuestion("Which evidence best supports the idea that Mars has a thin atmosphere?", "It has large temperature swings and frequent dust storms", "It has bright icy rings", "It produces its own light", "It is covered by liquid methane seas", "Big temperature changes are one sign that Mars has a thin atmosphere.")
+                };
+            case "jupiter":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why is Jupiter classified as a gas giant rather than a terrestrial planet?", "It is composed mostly of hydrogen and helium and lacks a solid rocky surface", "It is smaller than Mercury", "It has no gravity", "It is Earth's satellite", "Jupiter is a gas giant because it is massive and made mostly of light gases."),
+                    CreateQuestion("Why does Jupiter strongly influence nearby objects in the Solar System?", "Its enormous mass gives it very strong gravity", "Its surface is made of iron oxide", "It is closest to Earth", "It has no moons", "Jupiter's huge mass gives it a powerful gravitational pull.")
+                };
+            case "saturn":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why do Saturn's rings appear especially bright from a distance?", "Sunlight reflects off the icy ring particles", "The rings are made of molten metal", "The rings create their own light", "The rings absorb all sunlight", "Saturn's icy ring particles reflect a lot of sunlight."),
+                    CreateQuestion("Why is Saturn's average density unusual among planets?", "It is so low that it is less dense than water", "It is made only of iron", "It has no atmosphere", "It is the hottest planet", "Saturn's average density is remarkably low for such a large planet.")
+                };
+            case "uranus":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why does Uranus experience extreme and unusual seasons?", "Its axis is tilted about 98 degrees, so it rotates almost on its side", "It has no sunlight", "It orbits Earth", "Its rings block all heat", "Uranus's dramatic tilt leads to its unusual seasonal pattern."),
+                    CreateQuestion("Which clue best identifies Uranus instead of Neptune?", "Uranus is the ice giant famous for rotating on its side", "Uranus has the fastest winds in the Solar System", "Uranus is the closest planet to the Sun", "Uranus is the only star in our system", "Uranus is best known for its sideways rotation.")
+                };
+            case "neptune":
+                return new List<QuizQuestionData>
+                {
+                    CreateQuestion("Why can Neptune have powerful winds even though it is very far from the Sun?", "Internal heat and atmospheric dynamics help drive strong storms", "Neptune has no atmosphere", "Neptune is the hottest planet", "The Sun is closest to Neptune", "Neptune's internal energy helps power its strong winds."),
+                    CreateQuestion("Which clue best distinguishes Neptune from Uranus?", "Neptune is best known for its extremely fast winds and Triton", "Neptune rotates on its side more than any planet", "Neptune is the brightest ringed planet", "Neptune is Earth's natural satellite", "Neptune stands out for its powerful winds and its large moon Triton.")
+                };
+            default:
+                return new List<QuizQuestionData>();
+        }
+    }
+
+    private static List<QuizQuestionData> DeduplicateQuestions(List<QuizQuestionData> questions)
+    {
+        List<QuizQuestionData> uniqueQuestions = new List<QuizQuestionData>();
+        if (questions == null)
+        {
+            return uniqueQuestions;
+        }
+
+        HashSet<string> seen = new HashSet<string>(StringComparer.Ordinal);
+        for (int i = 0; i < questions.Count; i++)
+        {
+            QuizQuestionData question = questions[i];
+            if (question == null || string.IsNullOrWhiteSpace(question.question))
+            {
+                continue;
+            }
+
+            string key = NormalizeQuestionKey(question.question);
+            if (string.IsNullOrWhiteSpace(key) || !seen.Add(key))
+            {
+                continue;
+            }
+
+            uniqueQuestions.Add(question);
+        }
+
+        return uniqueQuestions;
+    }
+
+    private static string[] GetTypeDistractors(string correctType)
+    {
+        string[] allTypes =
+        {
+            "Star",
+            "Terrestrial planet",
+            "Gas giant",
+            "Ice giant",
+            "Natural satellite"
+        };
+
+        List<string> distractors = new List<string>();
+        for (int i = 0; i < allTypes.Length; i++)
+        {
+            if (!string.Equals(allTypes[i], correctType, StringComparison.OrdinalIgnoreCase))
+            {
+                distractors.Add(allTypes[i]);
+            }
+        }
+
+        return distractors.Take(3).ToArray();
+    }
+
+    private static string[] GetBodyDistractors(string key)
+    {
+        List<string> distractors = new List<string>();
+        TopicFactProfile[] profiles = GetAllTopicProfiles();
+        for (int i = 0; i < profiles.Length; i++)
+        {
+            if (!string.Equals(profiles[i].Key, key, StringComparison.OrdinalIgnoreCase))
+            {
+                distractors.Add(profiles[i].DisplayName);
+            }
+        }
+
+        return distractors.Take(3).ToArray();
+    }
+
+    private static string[] GetFactDistractors(string key, Func<TopicFactProfile, string> selector, params string[] fallbacks)
+    {
+        List<string> distractors = new List<string>();
+        TopicFactProfile[] profiles = GetAllTopicProfiles();
+        for (int i = 0; i < profiles.Length; i++)
+        {
+            TopicFactProfile profile = profiles[i];
+            if (string.Equals(profile.Key, key, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            string value = selector(profile);
+            if (string.IsNullOrWhiteSpace(value) || ContainsIgnoreCase(distractors, value))
+            {
+                continue;
+            }
+
+            distractors.Add(value);
+            if (distractors.Count == 3)
+            {
+                break;
+            }
+        }
+
+        for (int i = 0; i < fallbacks.Length && distractors.Count < 3; i++)
+        {
+            if (!string.IsNullOrWhiteSpace(fallbacks[i]) && !ContainsIgnoreCase(distractors, fallbacks[i]))
+            {
+                distractors.Add(fallbacks[i]);
+            }
+        }
+
+        while (distractors.Count < 3)
+        {
+            distractors.Add("Unknown observation");
+        }
+
+        return distractors.Take(3).ToArray();
+    }
+
+    private static bool ContainsIgnoreCase(List<string> values, string candidate)
+    {
+        for (int i = 0; i < values.Count; i++)
+        {
+            if (string.Equals(values[i], candidate, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static TopicFactProfile GetNthOtherProfile(string key, int index)
+    {
+        int foundCount = 0;
+        TopicFactProfile[] profiles = GetAllTopicProfiles();
+        for (int i = 0; i < profiles.Length; i++)
+        {
+            if (string.Equals(profiles[i].Key, key, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (foundCount == index)
+            {
+                return profiles[i];
+            }
+
+            foundCount++;
+        }
+
+        return null;
+    }
+
+    private static TopicFactProfile GetTopicFactProfile(string topic)
+    {
+        string normalizedTopic = NormalizeTopicKey(topic);
+        TopicFactProfile[] profiles = GetAllTopicProfiles();
+        for (int i = 0; i < profiles.Length; i++)
+        {
+            if (string.Equals(profiles[i].Key, normalizedTopic, StringComparison.OrdinalIgnoreCase))
+            {
+                return profiles[i];
+            }
+        }
+
+        return null;
+    }
+
+    private static TopicFactProfile[] GetAllTopicProfiles()
+    {
+        return new[]
+        {
+            new TopicFactProfile
+            {
+                Key = "sun",
+                DisplayName = "Sun",
+                TypeLabel = "Star",
+                RelationFact = "At the center of the Solar System",
+                FeatureFact = "Producing light and heat through nuclear fusion",
+                AtmosphereFact = "A composition dominated by hydrogen and helium plasma",
+                SystemFact = "Its gravity holds the planets in orbit",
+                DistinctionFact = "Is the only star in our Solar System",
+                Keywords = new[] { "sun", "star", "fusion", "center of the solar system", "hydrogen", "helium", "gravity" }
+            },
+            new TopicFactProfile
+            {
+                Key = "mercury",
+                DisplayName = "Mercury",
+                TypeLabel = "Terrestrial planet",
+                RelationFact = "The closest planet to the Sun",
+                FeatureFact = "A small, rocky world covered with many craters",
+                AtmosphereFact = "An extremely thin exosphere that cannot trap much heat",
+                SystemFact = "It has no natural moons or rings",
+                DistinctionFact = "Has the shortest year of the major planets",
+                Keywords = new[] { "mercury", "closest planet", "88 earth days", "craters", "thin exosphere", "smallest planet" }
+            },
+            new TopicFactProfile
+            {
+                Key = "venus",
+                DisplayName = "Venus",
+                TypeLabel = "Terrestrial planet",
+                RelationFact = "The second planet from the Sun",
+                FeatureFact = "A cloud-covered world with a powerful greenhouse effect",
+                AtmosphereFact = "A dense carbon dioxide atmosphere with sulfuric acid clouds",
+                SystemFact = "It has no natural moons and rotates very slowly",
+                DistinctionFact = "Is the hottest planet in the Solar System",
+                Keywords = new[] { "venus", "hottest planet", "greenhouse effect", "carbon dioxide", "sulfuric acid clouds", "second planet" }
+            },
+            new TopicFactProfile
+            {
+                Key = "earth",
+                DisplayName = "Earth",
+                TypeLabel = "Terrestrial planet",
+                RelationFact = "The third planet from the Sun",
+                FeatureFact = "A world with stable liquid water and life",
+                AtmosphereFact = "A nitrogen-oxygen atmosphere that supports living things",
+                SystemFact = "It has one natural moon and active plate tectonics",
+                DistinctionFact = "Is the only known habitable planet in the Solar System",
+                Keywords = new[] { "earth", "life", "liquid water", "nitrogen oxygen atmosphere", "habitable", "third planet" }
+            },
+            new TopicFactProfile
+            {
+                Key = "moon",
+                DisplayName = "Moon",
+                TypeLabel = "Natural satellite",
+                RelationFact = "Earth's natural satellite",
+                FeatureFact = "Showing the same face to Earth because it is tidally locked",
+                AtmosphereFact = "No thick atmosphere and a heavily cratered surface",
+                SystemFact = "Its gravity strongly affects Earth's ocean tides",
+                DistinctionFact = "Is the only natural moon of Earth",
+                Keywords = new[] { "moon", "natural satellite", "tidally locked", "tides", "craters", "phases" }
+            },
+            new TopicFactProfile
+            {
+                Key = "mars",
+                DisplayName = "Mars",
+                TypeLabel = "Terrestrial planet",
+                RelationFact = "The fourth planet from the Sun",
+                FeatureFact = "A reddish world with Olympus Mons and signs of ancient water",
+                AtmosphereFact = "A thin atmosphere made mostly of carbon dioxide",
+                SystemFact = "It has two small moons named Phobos and Deimos",
+                DistinctionFact = "Is widely known as the Red Planet",
+                Keywords = new[] { "mars", "red planet", "iron oxide", "olympus mons", "ancient water", "phobos", "deimos" }
+            },
+            new TopicFactProfile
+            {
+                Key = "jupiter",
+                DisplayName = "Jupiter",
+                TypeLabel = "Gas giant",
+                RelationFact = "The fifth planet from the Sun",
+                FeatureFact = "A giant planet famous for the Great Red Spot",
+                AtmosphereFact = "An atmosphere made mostly of hydrogen and helium",
+                SystemFact = "It has many moons including Io, Europa, Ganymede, and Callisto",
+                DistinctionFact = "Is the largest planet in the Solar System",
+                Keywords = new[] { "jupiter", "largest planet", "great red spot", "gas giant", "hydrogen and helium", "galilean moons" }
+            },
+            new TopicFactProfile
+            {
+                Key = "saturn",
+                DisplayName = "Saturn",
+                TypeLabel = "Gas giant",
+                RelationFact = "The sixth planet from the Sun",
+                FeatureFact = "A giant planet surrounded by bright rings",
+                AtmosphereFact = "An atmosphere made mostly of hydrogen and helium",
+                SystemFact = "It has many moons, including Titan, and broad icy rings",
+                DistinctionFact = "Is the planet most famous for its visible ring system",
+                Keywords = new[] { "saturn", "rings", "titan", "gas giant", "icy ring system", "sixth planet" }
+            },
+            new TopicFactProfile
+            {
+                Key = "uranus",
+                DisplayName = "Uranus",
+                TypeLabel = "Ice giant",
+                RelationFact = "The seventh planet from the Sun",
+                FeatureFact = "Rotating on its side with a blue-green appearance",
+                AtmosphereFact = "Methane in the atmosphere gives it a blue-green color",
+                SystemFact = "It has faint rings and many moons",
+                DistinctionFact = "Has the most dramatically tilted axis of the major planets",
+                Keywords = new[] { "uranus", "ice giant", "tilted axis", "rotates on its side", "methane", "blue green" }
+            },
+            new TopicFactProfile
+            {
+                Key = "neptune",
+                DisplayName = "Neptune",
+                TypeLabel = "Ice giant",
+                RelationFact = "The eighth and farthest major planet from the Sun",
+                FeatureFact = "A deep blue world with extremely fast winds",
+                AtmosphereFact = "Methane-rich upper layers over an ice-giant interior",
+                SystemFact = "It has a large moon named Triton",
+                DistinctionFact = "Is the windiest major planet in the Solar System",
+                Keywords = new[] { "neptune", "ice giant", "fast winds", "triton", "farthest planet", "deep blue" }
+            }
+        };
+    }
+
+    private static string NormalizeTopicKey(string topic)
+    {
+        return string.IsNullOrWhiteSpace(topic) ? string.Empty : topic.Trim().ToLowerInvariant();
     }
 
     private static string ResolveTopicDisplayName(string topic)

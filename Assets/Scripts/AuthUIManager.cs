@@ -72,6 +72,10 @@ public class AuthUIManager : MonoBehaviour
     private Button verifyAccountButton;
     private Button verifyAccountResendCodeButton;
     private Button logOutButton;
+    private GameObject logoutConfirmationModal;
+    private TMP_Text logoutModalMessageText;
+    private Button logoutModalConfirmButton;
+    private Button logoutModalCancelButton;
     private readonly List<Button> backToLoginButtons = new List<Button>();
     private readonly List<Button> menuOpenButtons = new List<Button>();
     private readonly List<Button> menuBackButtons = new List<Button>();
@@ -525,6 +529,28 @@ public class AuthUIManager : MonoBehaviour
             randomizeNameButton = FindButton(setDisplayNamePage, "Button");
             displayNameCharCounterText = FindText(setDisplayNamePage, "DisplayNameLabel1");
         }
+
+        logoutConfirmationModal = FindChildObject(menuRoot, "ConfirmationModal")
+            ?? FindChildObject(menuRoot, "Confirmation Modal");
+
+        if (logoutConfirmationModal != null)
+        {
+            logoutModalMessageText = FindText(logoutConfirmationModal, "ModalMessageText")
+                ?? FindText(logoutConfirmationModal, "MessageText")
+                ?? FindText(logoutConfirmationModal, "ConfirmText");
+
+            logoutModalConfirmButton = FindButton(logoutConfirmationModal, "ModalConfirmButton")
+                ?? FindButton(logoutConfirmationModal, "ConfirmButton")
+                ?? FindButton(logoutConfirmationModal, "YesButton")
+                ?? FindButtonByChildText(logoutConfirmationModal, "Yes");
+
+            logoutModalCancelButton = FindButton(logoutConfirmationModal, "ModalCancelButton")
+                ?? FindButton(logoutConfirmationModal, "CancelButton")
+                ?? FindButton(logoutConfirmationModal, "NoButton")
+                ?? FindButtonByChildText(logoutConfirmationModal, "No");
+
+            logoutConfirmationModal.SetActive(false);
+        }
     }
 
     private void RegisterListeners()
@@ -554,6 +580,8 @@ public class AuthUIManager : MonoBehaviour
         AddListener(verifyAccountButton, HandleVerifyAccountButton);
         AddListener(verifyAccountResendCodeButton, HandleVerifyAccountResendButton);
         AddListener(logOutButton, HandleLogOutButton);
+        AddListener(logoutModalConfirmButton, HandleConfirmLogoutPressed);
+        AddListener(logoutModalCancelButton, HideLogoutConfirmationModal);
         AddListener(confirmIdentityButton, HandleConfirmIdentity);
         AddListener(randomizeNameButton, HandleRandomizeName);
         if (displayNameInputField != null)
@@ -617,6 +645,8 @@ public class AuthUIManager : MonoBehaviour
         RemoveListener(verifyAccountButton, HandleVerifyAccountButton);
         RemoveListener(verifyAccountResendCodeButton, HandleVerifyAccountResendButton);
         RemoveListener(logOutButton, HandleLogOutButton);
+        RemoveListener(logoutModalConfirmButton, HandleConfirmLogoutPressed);
+        RemoveListener(logoutModalCancelButton, HideLogoutConfirmationModal);
         RemoveListener(confirmIdentityButton, HandleConfirmIdentity);
         RemoveListener(randomizeNameButton, HandleRandomizeName);
         if (displayNameInputField != null)
@@ -1275,6 +1305,11 @@ public class AuthUIManager : MonoBehaviour
 
     private void HandleLogOutButton()
     {
+        ShowLogoutConfirmationModal("Are you sure you want to log out?");
+    }
+
+    private void ConfirmLogout()
+    {
         if (SupabaseAuthService.Instance != null)
         {
             SupabaseAuthService.Instance.SignOut();
@@ -1282,6 +1317,36 @@ public class AuthUIManager : MonoBehaviour
 
         ApplyHistoryAccessState();
         ShowLoginPage();
+    }
+
+    private void ShowLogoutConfirmationModal(string message)
+    {
+        if (logoutConfirmationModal != null)
+        {
+            if (logoutModalMessageText != null)
+            {
+                logoutModalMessageText.text = message;
+            }
+            logoutConfirmationModal.SetActive(true);
+        }
+        else
+        {
+            ConfirmLogout();
+        }
+    }
+
+    private void HideLogoutConfirmationModal()
+    {
+        if (logoutConfirmationModal != null)
+        {
+            logoutConfirmationModal.SetActive(false);
+        }
+    }
+
+    private void HandleConfirmLogoutPressed()
+    {
+        ConfirmLogout();
+        HideLogoutConfirmationModal();
     }
 
     private IEnumerator TryRestoreSessionRoutine()
@@ -2043,11 +2108,6 @@ public class AuthUIManager : MonoBehaviour
         if (solarSystemUiRoot != null)
         {
             solarSystemUiRoot.SetActive(false);
-        }
-
-        if (planetInfoCard != null)
-        {
-            planetInfoCard.SetActive(false);
         }
 
         quizReturnTarget = QuizReturnTarget.SolarSystem;

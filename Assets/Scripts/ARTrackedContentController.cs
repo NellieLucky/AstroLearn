@@ -1,59 +1,66 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Vuforia;
 
 public class ARTrackedContentController : MonoBehaviour
 {
     [SerializeField] private GameObject trackedContentRoot;
     [SerializeField] private List<GameObject> extraObjectsToToggle = new List<GameObject>();
     [SerializeField] private bool hideContentOnStart = true;
+    [SerializeField] private bool requireStrictTracking = true;
+    [SerializeField] private bool enableTrackedManipulation = true;
     [SerializeField] private string arCanvasObjectName = "ARCanvas";
     [SerializeField] private string instructionTextObjectName = "InstructionText";
     [SerializeField] private string bodyNameOverride;
 
     private ARSceneUIController arSceneUiController;
     private GameObject instructionTextObject;
+    private ObserverBehaviour observerBehaviour;
     private string resolvedBodyName;
+    private bool hasAppliedTrackingState;
+    private bool lastAppliedTrackingState;
 
     private void Awake()
     {
         CacheArSceneUiController();
         CacheInstructionTextObject();
+        CacheObserverBehaviour();
+        EnsureTrackedManipulator();
         resolvedBodyName = ResolveBodyName();
 
         if (hideContentOnStart)
         {
-            SetTrackedVisible(false);
+            ApplyTrackingState(false, true);
+            return;
         }
+
+        RefreshTrackingState(true);
+    }
+
+    private void OnEnable()
+    {
+        CacheObserverBehaviour();
+        RefreshTrackingState(true);
+    }
+
+    private void Update()
+    {
+        RefreshTrackingState(false);
+    }
+
+    private void OnDisable()
+    {
+        ApplyTrackingState(false, true);
     }
 
     public void HandleTargetFound()
     {
-        CacheArSceneUiController();
-        SetTrackedVisible(true);
-        if (arSceneUiController != null)
-        {
-            arSceneUiController.HandleTrackedBodyFound(resolvedBodyName);
-            arSceneUiController.HideInstructionText();
-        }
-        else if (instructionTextObject != null)
-        {
-            instructionTextObject.SetActive(false);
-        }
+        ApplyTrackingState(true, false);
     }
 
     public void HandleTargetLost()
     {
-        CacheArSceneUiController();
-        SetTrackedVisible(false);
-        if (arSceneUiController != null)
-        {
-            arSceneUiController.HandleTrackedBodyLost(resolvedBodyName);
-            arSceneUiController.ShowInstructionText();
-        }
-        else if (instructionTextObject != null)
-        {
-            instructionTextObject.SetActive(true);
-        }
+        ApplyTrackingState(false, false);
     }
 
     public void SetTrackedVisible(bool isVisible)
@@ -70,6 +77,67 @@ public class ARTrackedContentController : MonoBehaviour
                 extraObject.SetActive(isVisible);
             }
         }
+    }
+
+    private void RefreshTrackingState(bool forceApply)
+    {
+        CacheObserverBehaviour();
+        if (observerBehaviour == null)
+        {
+            return;
+        }
+
+        bool isTracked = IsTrackedNow();
+        ApplyTrackingState(isTracked, forceApply);
+    }
+
+    private void ApplyTrackingState(bool isTracked, bool forceApply)
+    {
+        CacheArSceneUiController();
+
+        if (!forceApply && hasAppliedTrackingState && lastAppliedTrackingState == isTracked)
+        {
+            return;
+        }
+
+        hasAppliedTrackingState = true;
+        lastAppliedTrackingState = isTracked;
+
+        SetTrackedVisible(isTracked);
+
+        if (arSceneUiController != null)
+        {
+            if (isTracked)
+            {
+                arSceneUiController.HandleTrackedBodyFound(resolvedBodyName);
+                arSceneUiController.HideInstructionText();
+            }
+            else
+            {
+                arSceneUiController.HandleTrackedBodyLost(resolvedBodyName);
+                arSceneUiController.ShowInstructionText();
+            }
+        }
+        else if (instructionTextObject != null && instructionTextObject.activeSelf == isTracked)
+        {
+            instructionTextObject.SetActive(!isTracked);
+        }
+    }
+
+    private bool IsTrackedNow()
+    {
+        if (observerBehaviour == null)
+        {
+            return false;
+        }
+
+        Status currentStatus = observerBehaviour.TargetStatus.Status;
+        if (!requireStrictTracking)
+        {
+            return currentStatus == Status.TRACKED || currentStatus == Status.EXTENDED_TRACKED;
+        }
+
+        return currentStatus == Status.TRACKED;
     }
 
     private void CacheArSceneUiController()
@@ -106,6 +174,29 @@ public class ARTrackedContentController : MonoBehaviour
             {
                 instructionTextObject = instruction.gameObject;
             }
+        }
+    }
+
+    private void CacheObserverBehaviour()
+    {
+        if (observerBehaviour != null)
+        {
+            return;
+        }
+
+        observerBehaviour = GetComponent<ObserverBehaviour>();
+    }
+
+    private void EnsureTrackedManipulator()
+    {
+        if (!enableTrackedManipulation || trackedContentRoot == null)
+        {
+            return;
+        }
+
+        if (trackedContentRoot.GetComponent<ARTrackedObjectManipulator>() == null)
+        {
+            trackedContentRoot.AddComponent<ARTrackedObjectManipulator>();
         }
     }
 
